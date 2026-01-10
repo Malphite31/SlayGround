@@ -221,7 +221,7 @@ export const useGameStore = create<GameState>()(
 
                 // Call API
                 try {
-                    await fetch('/api/game/create', {
+                    const res = await fetch('/api/game/create', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -230,8 +230,16 @@ export const useGameStore = create<GameState>()(
                             totalStages: quest.problems.length
                         })
                     });
+
+                    if (!res.ok) {
+                        const err = await res.json() as any;
+                        alert(`Failed to create game: ${err.error || 'Unknown error'}`);
+                        return;
+                    }
                 } catch (e) {
                     console.error("Failed to create game on server", e);
+                    alert("Network error: Could not reach game server.");
+                    return;
                 }
 
                 set({
