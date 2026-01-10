@@ -22,8 +22,14 @@ export function AdminDashboard() {
         removeBots,
         isQRVisible, // Added
         toggleQR, // Added
-        startSync // Added
+        startSync, // Added
+        loadQuests // Added
     } = useGameStore();
+
+    // Load quests from database on mount
+    useEffect(() => {
+        loadQuests();
+    }, []);
 
     // Start polling sync on mount
     useEffect(() => {
