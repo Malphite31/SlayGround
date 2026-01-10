@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS quests (
   updated_at INTEGER DEFAULT (strftime('%s', 'now'))
 );
 
--- Seed default quests
-INSERT INTO quests (id, title, description, problems) VALUES 
+-- Seed default quests (will replace if they already exist)
+INSERT OR REPLACE INTO quests (id, title, description, problems) VALUES 
 ('intro-algebra', 'Intro to Algebra', 'Basic algebra problems for beginners', 
 '[{"question":"Solve: x + 5 = 12","answer":"7","type":"multiple-choice","choices":["5","7","17","12"],"stage":1},{"question":"The answer to x - 3 = 10 is ___","answer":"13","type":"fill-blank","stage":2},{"question":"x + 8 = 20. True or False: x = 12","answer":"True","type":"true-false","choices":["True","False"],"stage":3},{"question":"Solve: x - 7 = 5","answer":"12","type":"short-answer","stage":4},{"question":"If x + 9 = 15, what is x?","answer":"6","type":"multiple-choice","choices":["3","6","9","24"],"stage":5}]'),
 
