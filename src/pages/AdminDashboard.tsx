@@ -74,13 +74,15 @@ export function AdminDashboard() {
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        // Simple hardcoded key for now - can be moved to env/store
-        if (password === '1234' || password === 'admin') {
+        // Strict Admin Key validation
+        const validKeys = ['admin'];
+
+        if (validKeys.includes(password)) {
             setIsAuthenticated(true);
             sessionStorage.setItem('admin_auth', 'true');
             setAuthError('');
         } else {
-            setAuthError('Invalid Access Key');
+            setAuthError('Invalid Access Key. The key is "admin"');
         }
     };
 
