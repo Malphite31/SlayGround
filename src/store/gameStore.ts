@@ -225,15 +225,26 @@ export const useGameStore = create<GameState>()(
 
             startSync: () => {
                 if (get().syncInterval) return;
-                const interval = setInterval(async () => {
+
+                console.log('[Sync] Starting sync...');
+
+                // Sync immediately first
+                const syncFn = async () => {
                     const pin = get().gamePin;
-                    // Only sync if we are in a game context
-                    if (!pin) return;
+                    if (!pin) {
+                        console.log('[Sync] No PIN, skipping');
+                        return;
+                    }
 
                     try {
+                        console.log(`[Sync] Fetching /api/game/${pin}`);
                         const res = await fetch(`/api/game/${pin}`);
-                        if (!res.ok) return;
+                        if (!res.ok) {
+                            console.error('[Sync] Response not OK:', res.status);
+                            return;
+                        }
                         const data = await res.json();
+                        console.log('[Sync] Received data:', data);
 
                         // Merge Server State
                         set(() => ({
@@ -245,14 +256,18 @@ export const useGameStore = create<GameState>()(
                                 hasAnswered: s.hasAnswered || !!s.has_answered,
                                 currentStage: s.currentStage || s.current_stage || 1
                             })),
-                            // If Host, we are source of truth for Status/Stage usually,
-                            // but if we are client (Student), we need to listen.
-                            // For simplicity, everyone listens to DB, but Host writes to DB.
                         }));
+                        console.log('[Sync] Updated students:', data.students.length);
                     } catch (e) {
-                        // silent fail
+                        console.error('[Sync] Error:', e);
                     }
-                }, 2000); // Poll every 2s
+                };
+
+                // Call immediately
+                syncFn();
+
+                // Then poll every 2s
+                const interval = setInterval(syncFn, 2000);
                 set({ syncInterval: interval });
             },
 
