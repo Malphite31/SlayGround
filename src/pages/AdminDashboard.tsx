@@ -82,7 +82,7 @@ export function AdminDashboard() {
             sessionStorage.setItem('admin_auth', 'true');
             setAuthError('');
         } else {
-            setAuthError('Invalid Access Key. The key is "admin"');
+            setAuthError('Invalid Access Key');
         }
     };
 
