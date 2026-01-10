@@ -23,9 +23,19 @@ export function HostView() {
     // Start polling sync if game is active
     useEffect(() => {
         if (gamePin) {
+            console.log('[HostView] Game PIN detected, starting sync:', gamePin);
             startSync();
         }
-    }, [gamePin]);
+    }, [gamePin, startSync]);
+
+    // Also try to sync on mount in case gamePin is already set
+    useEffect(() => {
+        const pin = useGameStore.getState().gamePin;
+        if (pin) {
+            console.log('[HostView] Mounted with existing PIN, starting sync:', pin);
+            startSync();
+        }
+    }, [startSync]);
 
     const currentProblem = currentQuest?.problems.find(p => p.stage === currentStage);
     const answeredCount = students.filter(s => s.hasAnswered).length;
