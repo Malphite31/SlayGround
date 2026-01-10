@@ -29,8 +29,8 @@ export function StudentView() {
 
         const res = await joinGame(pin, name);
 
-        if (res.success) {
-            navigate('/play/game', { state: { name, pin } });
+        if (res.success && res.studentId) {
+            navigate('/play/game', { state: { name, pin, studentId: res.studentId } });
         } else {
             setError(res.error || 'Failed to join game');
         }

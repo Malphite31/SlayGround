@@ -53,7 +53,7 @@ interface GameState {
     pauseGame: () => void;
     finishGame: () => void; // Explicitly finish game
     toggleQR: (visible: boolean) => void;
-    joinGame: (pin: string, name: string) => Promise<{ success: boolean; error?: string }>;
+    joinGame: (pin: string, name: string) => Promise<{ success: boolean; error?: string; studentId?: string }>;
     markStudentAnswered: (studentId: string, isCorrect: boolean) => Promise<void>;
     updateStudentProgress: (studentId: string, stage: number, score: number) => void;
     nextStage: () => Promise<void>;
@@ -274,7 +274,7 @@ export const useGameStore = create<GameState>()(
 
                     // Optimistic update locally? 
                     // No, wait for poll or just set basic info
-                    return { success: true };
+                    return { success: true, studentId };
                 } catch (e) {
                     return { success: false, error: 'Network error' };
                 }
