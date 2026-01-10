@@ -5,3 +5,7 @@ pages_build_output_dir = "dist"
 
 
 
+[[d1_databases]]
+binding = "DB"
+database_name = "slayground-db"
+database_id = "2197eac-aa17-c4cf-7c4da-3c16f7c0a37b"
