@@ -4,7 +4,4 @@ compatibility_date = "2024-04-03"
 pages_build_output_dir = "dist"
 
 
-[[d1_databases]]
-binding = "DB"
-database_name = "slayground-db"
-database_id = "put-your-database-id-here" # Run: npx wrangler d1 create slayground-db
+
