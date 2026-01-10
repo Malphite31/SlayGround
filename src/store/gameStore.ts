@@ -216,7 +216,8 @@ export const useGameStore = create<GameState>()(
                 const quest = get().quests.find(q => q.id === questId);
                 if (!quest) return;
 
-                const pin = "1234!";
+                // Generate random 4-digit PIN
+                const pin = Math.floor(1000 + Math.random() * 9000).toString();
 
                 // Call API
                 try {
