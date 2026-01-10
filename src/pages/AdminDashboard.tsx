@@ -19,7 +19,6 @@ export function AdminDashboard() {
         pauseGame,
         nextStage,
         deleteQuest,
-        addStudent,
         removeBots,
         isQRVisible, // Added
         toggleQR // Added
@@ -48,12 +47,7 @@ export function AdminDashboard() {
         toggleQR(!isQRVisible);
     };
 
-    const handleSimulateStudents = () => {
-        for (let i = 1; i <= 50; i++) {
-            const botId = `bot-${Math.random().toString(36).substr(2, 9)}`;
-            addStudent(botId, `Bot ${i}`);
-        }
-    };
+
 
     const handleClearBots = () => {
         if (confirm('Remove all simulated bots?')) {
@@ -198,10 +192,7 @@ export function AdminDashboard() {
 
                             <div className="h-6 md:h-8 w-px bg-white/10 mx-1 md:mx-2 flex-shrink-0"></div>
 
-                            <Button variant="ghost" onClick={handleSimulateStudents} className="rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 text-slate-400 hover:text-white hover:bg-white/5 bg-black/20 border-dashed border border-white/10">
-                                <Users className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
-                                +5
-                            </Button>
+
                             <Button variant="ghost" onClick={handleClearBots} className="rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 bg-black/20 border-dashed border border-red-500/20">
                                 <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
                                 Clear

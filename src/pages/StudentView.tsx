@@ -9,29 +9,32 @@ export function StudentView() {
     const [searchParams] = useSearchParams();
     const urlPin = searchParams.get('pin');
 
-    const [pin, setPin] = useState(urlPin || '');
+    const { gamePin, joinGame } = useGameStore();
+
+    const [pin, setPin] = useState(urlPin || gamePin || '');
     const [name, setName] = useState('');
     const [error, setError] = useState('');
 
-    const { gamePin, addStudent } = useGameStore();
+    const [isJoining, setIsJoining] = useState(false);
 
-    const handleJoin = () => {
+    const handleJoin = async () => {
         setError('');
+        setIsJoining(true);
 
         if (!pin.trim() || !name.trim()) {
             setError('Please fill in all fields');
+            setIsJoining(false);
             return;
         }
 
-        if (pin !== gamePin) {
-            setError('Invalid game PIN');
-            return;
-        }
+        const res = await joinGame(pin, name);
 
-        const studentId = Math.random().toString(36).substr(2, 9);
-        addStudent(studentId, name);
-        // Navigate to game play screen with student ID
-        navigate('/play/game', { state: { studentId } });
+        if (res.success) {
+            navigate('/play/game', { state: { name, pin } });
+        } else {
+            setError(res.error || 'Failed to join game');
+        }
+        setIsJoining(false);
     };
 
     return (
@@ -94,11 +97,12 @@ export function StudentView() {
                     size="xl"
                     variant="primary"
                     glow
+                    isLoading={isJoining}
                     className="w-full shadow-lg shadow-primary/30 group text-lg md:text-xl py-4 md:py-6 rounded-xl md:rounded-2xl"
                     onClick={handleJoin}
                 >
                     ENTER GAME
-                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6 ml-1 group-hover:translate-x-1 transition-transform" />
+                    {!isJoining && <ChevronRight className="w-5 h-5 md:w-6 md:h-6 ml-1 group-hover:translate-x-1 transition-transform" />}
                 </Button>
             </div>
 
