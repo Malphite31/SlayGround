@@ -45,17 +45,18 @@ interface GameState {
     timeRemaining: number;
     timerDuration: number;
     isQRVisible: boolean;
+    syncInterval: any;
 
     // Actions
-    createGame: (questId: string, timerDuration?: number) => void;
+    createGame: (questId: string, timerDuration?: number) => Promise<void>;
     startGame: () => void;
     pauseGame: () => void;
     finishGame: () => void; // Explicitly finish game
     toggleQR: (visible: boolean) => void;
-    addStudent: (id: string, name: string) => void;
-    markStudentAnswered: (studentId: string, isCorrect: boolean) => void;
+    joinGame: (pin: string, name: string) => Promise<{ success: boolean; error?: string }>;
+    markStudentAnswered: (studentId: string, isCorrect: boolean) => Promise<void>;
     updateStudentProgress: (studentId: string, stage: number, score: number) => void;
-    nextStage: () => void;
+    nextStage: () => Promise<void>;
     endGame: () => void;
     addQuest: (quest: Omit<Quest, 'id' | 'createdAt' | 'updatedAt'>) => void;
     updateQuest: (questId: string, quest: Omit<Quest, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -63,6 +64,8 @@ interface GameState {
     removeBots: () => void;
     setTimeRemaining: (time: number) => void;
     resetTimer: () => void;
+    startSync: () => void;
+    stopSync: () => void;
 }
 
 const defaultQuests: Quest[] = [
@@ -207,12 +210,29 @@ export const useGameStore = create<GameState>()(
             timeRemaining: 30,
             timerDuration: 30,
             isQRVisible: false,
+            syncInterval: null,
 
-            createGame: (questId, timerDuration = 30) => {
+            createGame: async (questId, timerDuration = 30) => {
                 const quest = get().quests.find(q => q.id === questId);
                 if (!quest) return;
 
                 const pin = "1234!";
+
+                // Call API
+                try {
+                    await fetch('/api/game/create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            questId,
+                            pin,
+                            totalStages: quest.problems.length
+                        })
+                    });
+                } catch (e) {
+                    console.error("Failed to create game on server", e);
+                }
+
                 set({
                     gamePin: pin,
                     currentQuest: quest,
@@ -223,40 +243,71 @@ export const useGameStore = create<GameState>()(
                     students: [],
                     timerDuration,
                     timeRemaining: timerDuration,
-                    isQRVisible: true, // Auto-show guide on creation
+                    isQRVisible: true,
                 });
+
+                get().startSync();
             },
 
-            startGame: () => set({ status: 'playing', isActive: true, isQRVisible: false }), // Auto-hide guide on start
+            joinGame: async (pin, name) => {
+                const studentId = crypto.randomUUID();
+
+                try {
+                    const res = await fetch('/api/student/join', {
+                        method: 'POST',
+                        body: JSON.stringify({ pin, name, studentId })
+                    });
+                    const data = await res.json();
+
+                    if (!data.success) {
+                        return { success: false, error: data.error };
+                    }
+
+                    // Optimistic update locally? 
+                    // No, wait for poll or just set basic info
+                    return { success: true };
+                } catch (e) {
+                    return { success: false, error: 'Network error' };
+                }
+            },
+
+            startGame: () => set({ status: 'playing', isActive: true, isQRVisible: false }),
             pauseGame: () => set({ status: 'paused', isActive: false }),
 
-            finishGame: () => set({ status: 'finished', isActive: false }),
+            finishGame: async () => {
+                const pin = get().gamePin;
+                if (pin) {
+                    fetch('/api/game/update', {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'finish_game', pin })
+                    }).catch(console.error);
+                }
+                set({ status: 'finished', isActive: false });
+            },
+
             toggleQR: (visible) => set({ isQRVisible: visible }),
 
-            addStudent: (id, name) => set((state) => ({
-                students: [
-                    ...state.students,
-                    {
-                        id,
-                        name,
-                        score: 0,
-                        currentStage: 1,
-                        hasAnswered: false,
-                    },
-                ],
-            })),
+            markStudentAnswered: async (studentId, isCorrect) => {
+                const stage = get().currentStage;
+                // Optimistic Update
+                set((state) => ({
+                    students: state.students.map((student) =>
+                        student.id === studentId
+                            ? {
+                                ...student,
+                                hasAnswered: true,
+                                score: isCorrect ? student.score + 100 : student.score
+                            }
+                            : student
+                    ),
+                }));
 
-            markStudentAnswered: (studentId, isCorrect) => set((state) => ({
-                students: state.students.map((student) =>
-                    student.id === studentId
-                        ? {
-                            ...student,
-                            hasAnswered: true,
-                            score: isCorrect ? student.score + 100 : student.score
-                        }
-                        : student
-                ),
-            })),
+                // API Call
+                fetch('/api/student/answer', {
+                    method: 'POST',
+                    body: JSON.stringify({ studentId, isCorrect, stage })
+                }).catch(console.error);
+            },
 
             updateStudentProgress: (studentId, stage, score) => set((state) => ({
                 students: state.students.map((student) =>
@@ -266,26 +317,81 @@ export const useGameStore = create<GameState>()(
                 ),
             })),
 
-            nextStage: () => set((state) => {
+            nextStage: async () => {
+                const state = get();
+                const nextStage = state.currentStage + 1;
+                const pin = state.gamePin;
+
                 if (state.currentStage >= state.totalStages) {
-                    return { status: 'finished', isActive: false };
+                    get().finishGame();
+                    return;
                 }
-                return {
-                    currentStage: state.currentStage + 1,
+
+                if (pin) {
+                    fetch('/api/game/update', {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'next_stage', pin, stage: nextStage })
+                    }).catch(console.error);
+                }
+
+                set({
+                    currentStage: nextStage,
                     timeRemaining: state.timerDuration,
                     students: state.students.map(s => ({ ...s, hasAnswered: false })),
-                };
-            }),
+                });
+            },
 
-            endGame: () => set({
-                status: 'idle',
-                isActive: false,
-                gamePin: null,
-                currentStage: 0,
-                students: [],
-                currentQuest: null,
-                timeRemaining: 30,
-            }),
+            startSync: () => {
+                if (get().syncInterval) return;
+                const interval = setInterval(async () => {
+                    const pin = get().gamePin;
+                    // Only sync if we are in a game context
+                    if (!pin) return;
+
+                    try {
+                        const res = await fetch(`/api/game/${pin}`);
+                        if (!res.ok) return;
+                        const data = await res.json();
+
+                        // Merge Server State
+                        set(() => ({
+                            // Use server source of truth for students
+                            students: data.students.map((s: any) => ({
+                                id: s.id,
+                                name: s.name,
+                                score: s.score || 0,
+                                hasAnswered: !!s.has_answered,
+                                currentStage: s.current_stage || 1
+                            })),
+                            // If Host, we are source of truth for Status/Stage usually,
+                            // but if we are client (Student), we need to listen.
+                            // For simplicity, everyone listens to DB, but Host writes to DB.
+                        }));
+                    } catch (e) {
+                        // silent fail
+                    }
+                }, 2000); // Poll every 2s
+                set({ syncInterval: interval });
+            },
+
+            stopSync: () => {
+                const interval = get().syncInterval;
+                if (interval) clearInterval(interval);
+                set({ syncInterval: null });
+            },
+
+            endGame: () => {
+                get().stopSync();
+                set({
+                    status: 'idle',
+                    isActive: false,
+                    gamePin: null,
+                    currentStage: 0,
+                    students: [],
+                    currentQuest: null,
+                    timeRemaining: 30,
+                });
+            },
 
             addQuest: (quest) => set((state) => ({
                 quests: [
