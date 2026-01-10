@@ -369,8 +369,8 @@ export const useGameStore = create<GameState>()(
                                 id: s.id,
                                 name: s.name,
                                 score: s.score || 0,
-                                hasAnswered: !!s.has_answered,
-                                currentStage: s.current_stage || 1
+                                hasAnswered: s.hasAnswered || !!s.has_answered,
+                                currentStage: s.currentStage || s.current_stage || 1
                             })),
                             // If Host, we are source of truth for Status/Stage usually,
                             // but if we are client (Student), we need to listen.

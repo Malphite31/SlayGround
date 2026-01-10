@@ -16,8 +16,16 @@ export function HostView() {
         timeRemaining,
         setTimeRemaining,
         nextStage,
-        status
+        status,
+        startSync // Added
     } = useGameStore();
+
+    // Start polling sync if game is active
+    useEffect(() => {
+        if (gamePin) {
+            startSync();
+        }
+    }, [gamePin]);
 
     const currentProblem = currentQuest?.problems.find(p => p.stage === currentStage);
     const answeredCount = students.filter(s => s.hasAnswered).length;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Play, Pause, SkipForward, Trash2, Edit, Users, Presentation, Copy, Scan } from 'lucide-react';
 import { Button } from '../components/ui/Button';
@@ -21,8 +21,16 @@ export function AdminDashboard() {
         deleteQuest,
         removeBots,
         isQRVisible, // Added
-        toggleQR // Added
+        toggleQR, // Added
+        startSync // Added
     } = useGameStore();
+
+    // Start polling sync on mount
+    useEffect(() => {
+        if (gamePin) {
+            startSync();
+        }
+    }, [gamePin]);
 
     const handleLaunchQuest = (questId: string) => {
         if (gamePin && !confirm('This will end the current session and kick all students. Start new game?')) {
