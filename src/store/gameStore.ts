@@ -67,6 +67,7 @@ interface GameState {
     resetTimer: () => void;
     startSync: () => void;
     stopSync: () => void;
+    syncGameState: () => Promise<void>;
 }
 
 export const useGameStore = create<GameState>()(
@@ -223,51 +224,53 @@ export const useGameStore = create<GameState>()(
                 });
             },
 
+            syncGameState: async () => {
+                const pin = get().gamePin;
+                if (!pin) {
+                    console.log('[Sync] No PIN, skipping');
+                    return;
+                }
+
+                try {
+                    // console.log(`[Sync] Fetching /api/game/${pin}`); // Reduce noise
+                    const res = await fetch(`/api/game/${pin}`);
+                    if (!res.ok) {
+                        return;
+                    }
+                    const data = await res.json();
+
+                    // Merge Server State
+                    set(() => ({
+                        // Use server source of truth for students
+                        students: data.students.map((s: any) => ({
+                            id: s.id,
+                            name: s.name,
+                            score: s.score || 0,
+                            hasAnswered: s.hasAnswered || !!s.has_answered,
+                            currentStage: s.currentStage || s.current_stage || 1
+                        })),
+                    }));
+                } catch (e) {
+                    console.error('[Sync] Error:', e);
+                }
+            },
+
             startSync: () => {
-                if (get().syncInterval) return;
+                if (get().syncInterval) {
+                    // Clear existing interval just in case it's a stale ID from hydration
+                    clearInterval(get().syncInterval);
+                }
 
                 console.log('[Sync] Starting sync...');
 
-                // Sync immediately first
-                const syncFn = async () => {
-                    const pin = get().gamePin;
-                    if (!pin) {
-                        console.log('[Sync] No PIN, skipping');
-                        return;
-                    }
-
-                    try {
-                        console.log(`[Sync] Fetching /api/game/${pin}`);
-                        const res = await fetch(`/api/game/${pin}`);
-                        if (!res.ok) {
-                            console.error('[Sync] Response not OK:', res.status);
-                            return;
-                        }
-                        const data = await res.json();
-                        console.log('[Sync] Received data:', data);
-
-                        // Merge Server State
-                        set(() => ({
-                            // Use server source of truth for students
-                            students: data.students.map((s: any) => ({
-                                id: s.id,
-                                name: s.name,
-                                score: s.score || 0,
-                                hasAnswered: s.hasAnswered || !!s.has_answered,
-                                currentStage: s.currentStage || s.current_stage || 1
-                            })),
-                        }));
-                        console.log('[Sync] Updated students:', data.students.length);
-                    } catch (e) {
-                        console.error('[Sync] Error:', e);
-                    }
-                };
-
                 // Call immediately
-                syncFn();
+                get().syncGameState();
 
                 // Then poll every 2s
-                const interval = setInterval(syncFn, 2000);
+                const interval = setInterval(() => {
+                    get().syncGameState();
+                }, 2000);
+
                 set({ syncInterval: interval });
             },
 
@@ -365,6 +368,10 @@ export const useGameStore = create<GameState>()(
         }),
         {
             name: 'slayground-storage',
+            partialize: (state) => ({
+                ...state,
+                syncInterval: null // Do not persist interval ID
+            }),
         }
     )
 );
