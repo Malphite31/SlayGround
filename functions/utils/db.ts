@@ -19,7 +19,11 @@ export function handleOptions(request: Request) {
 export function jsonResponse(data: any, status = 200) {
     return new Response(JSON.stringify(data), {
         status,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, max-age=0' 
+        },
     });
 }
 

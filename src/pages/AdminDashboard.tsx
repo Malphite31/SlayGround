@@ -79,6 +79,21 @@ export function AdminDashboard() {
         startGame();
     };
 
+    const handleManualSync = async () => {
+        if (!gamePin) return;
+        try {
+            const res = await fetch(`/api/game/${gamePin}`);
+            if (res.ok) {
+                const data = await res.json();
+                alert(`Synced! Found ${data.students?.length || 0} students`);
+                // Force a re-render by calling startSync
+                startSync();
+            }
+        } catch (e) {
+            alert('Sync failed');
+        }
+    };
+
     // Admin Auth State
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         return sessionStorage.getItem('admin_auth') === 'true';
