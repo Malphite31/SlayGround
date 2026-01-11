@@ -38,9 +38,29 @@ export function GamePlay() {
     }, [currentStage]);
 
     useEffect(() => {
+        // Start syncing when in game play
+        const { startSync, stopSync } = useGameStore.getState();
+        startSync();
+
+        return () => {
+            stopSync();
+        };
+    }, []);
+
+    useEffect(() => {
         // Only redirect if there's no quest or studentId (invalid state)
-        // Allow students to wait in lobby when status is 'idle'
-        if (!currentQuest || !studentId) {
+        // AND we have given it a moment to load? 
+        // Actually, if we just started sync, currentQuest might be null for a second.
+        // We should show loading instead of redirecting immediately if gamePin exists.
+
+        const { gamePin } = useGameStore.getState();
+
+        if (!studentId) {
+            navigate('/play');
+            return;
+        }
+
+        if (!currentQuest && !gamePin) {
             navigate('/play');
         }
     }, [currentQuest, navigate, studentId]);

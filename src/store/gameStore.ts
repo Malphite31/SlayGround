@@ -148,6 +148,9 @@ export const useGameStore = create<GameState>()(
 
                     // Optimistic update locally? 
                     // No, wait for poll or just set basic info
+                    // Set gamePin locally so sync works
+                    set({ gamePin: pin });
+
                     return { success: true, studentId };
                 } catch (e) {
                     return { success: false, error: 'Network error' };
@@ -240,7 +243,12 @@ export const useGameStore = create<GameState>()(
                     const data = await res.json();
 
                     // Merge Server State
+                    const { status, current_stage, total_stages, quest_id } = data;
+
                     set(() => ({
+                        status: status || 'idle',
+                        currentStage: current_stage || 1,
+                        totalStages: total_stages || 0,
                         // Use server source of truth for students
                         students: data.students.map((s: any) => ({
                             id: s.id,
@@ -250,6 +258,21 @@ export const useGameStore = create<GameState>()(
                             currentStage: s.currentStage || s.current_stage || 1
                         })),
                     }));
+
+                    // Fetch Quest if missing or different
+                    const currentQuest = get().currentQuest;
+                    if (quest_id && (!currentQuest || currentQuest.id !== quest_id)) {
+                        console.log('[Sync] Fetching quest details for', quest_id);
+                        try {
+                            const questRes = await fetch(`/api/quest/${quest_id}`);
+                            if (questRes.ok) {
+                                const questData = await questRes.json();
+                                set({ currentQuest: questData });
+                            }
+                        } catch (qe) {
+                            console.error('[Sync] Failed to fetch quest', qe);
+                        }
+                    }
                 } catch (e) {
                     console.error('[Sync] Error:', e);
                 }
