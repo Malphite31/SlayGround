@@ -16,6 +16,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         const gameId = crypto.randomUUID();
 
+        // Ensure fresh start: Delete any existing game with this PIN
+        await env.DB.prepare(
+            `DELETE FROM students WHERE game_id IN (SELECT id FROM games WHERE pin = ?)`
+        ).bind(pin).run();
+
+        await env.DB.prepare(
+            `DELETE FROM games WHERE pin = ?`
+        ).bind(pin).run();
+
         // Insert into D1
         const { success } = await env.DB.prepare(
             `INSERT INTO games (id, pin, status, current_stage, quest_id, total_stages) VALUES (?, ?, ?, ?, ?, ?)`
