@@ -93,6 +93,7 @@ export function AdminDashboard() {
     });
     const [password, setPassword] = useState('');
     const [authError, setAuthError] = useState('');
+    const [isManualOpen, setIsManualOpen] = useState(false);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -167,10 +168,16 @@ export function AdminDashboard() {
                         </h1>
                         <p className="text-slate-400 text-xs md:text-lg font-medium hidden md:block">Manage your Finding X activities.</p>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-400 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/10 rounded-lg md:rounded-xl text-xs md:text-base h-8 md:h-10 px-3 md:px-4">
-                        <span className="hidden md:inline">Log Out</span>
-                        <span className="md:hidden">Exit</span>
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => setIsManualOpen(true)} className="text-slate-400 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/10 rounded-lg md:rounded-xl text-xs md:text-base h-8 md:h-10 px-3 md:px-4">
+                            <span className="hidden md:inline">User Manual</span>
+                            <span className="md:hidden">Help</span>
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-400 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/10 rounded-lg md:rounded-xl text-xs md:text-base h-8 md:h-10 px-3 md:px-4">
+                            <span className="hidden md:inline">Log Out</span>
+                            <span className="md:hidden">Exit</span>
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Toolbar */}
@@ -370,6 +377,89 @@ export function AdminDashboard() {
                                 <div className="text-2xl font-bold text-accent">{student.score}</div>
                             </div>
                         ))}
+                    </div>
+                </div>
+            )}
+            {/* User Manual Modal */}
+            {isManualOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setIsManualOpen(false)}>
+                    <div className="glass-panel w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 rounded-3xl border-white/20 shadow-2xl relative" onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setIsManualOpen(false)} className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
+                            <Plus className="w-6 h-6 rotate-45" />
+                        </button>
+
+                        <h2 className="text-4xl font-heading font-black text-white mb-8">User Manual</h2>
+
+                        <div className="space-y-10 text-slate-300">
+                            <section>
+                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-sm">1</span>
+                                    Getting Started
+                                </h3>
+                                <div className="pl-11 space-y-2">
+                                    <p>Welcome to SlayGround! To begin a session:</p>
+                                    <ul className="list-disc pl-5 space-y-1">
+                                        <li>Create a new quest by clicking <strong>New Quest</strong> or select an existing one from the library.</li>
+                                        <li>Click the <Play className="w-4 h-4 inline text-primary" /> <strong>Play</strong> icon on a quest to initialize the game environment.</li>
+                                        <li>This will generate a unique 4-digit <strong>Game PIN</strong>.</li>
+                                    </ul>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-sm">2</span>
+                                    Hosting & Projector
+                                </h3>
+                                <div className="pl-11 space-y-2">
+                                    <p>Once a game is initialized:</p>
+                                    <ul className="list-disc pl-5 space-y-1">
+                                        <li>Click <strong>Launch Projector</strong> to open the Host View in a new tab. Drag this to the projector screen.</li>
+                                        <li>On the Host View, students can scan the <strong>QR Code</strong> to join instantly.</li>
+                                        <li>Alternatively, they can visit <code>{window.location.host}/play</code> and enter the Game PIN manually.</li>
+                                    </ul>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-sm">3</span>
+                                    Managing the Game
+                                </h3>
+                                <div className="pl-11 space-y-2">
+                                    <p>Control the flow from this Command Center:</p>
+                                    <ul className="list-disc pl-5 space-y-1">
+                                        <li><strong>Start Game:</strong> Begins the first question timer. Questions appear on the projector and student devices simultaneously.</li>
+                                        <li><strong>Next Stage:</strong> Manually advances to the next question if needed (usually automatic after timer).</li>
+                                        <li><strong>Pause:</strong> Temporarily stops the timer and gameplay.</li>
+                                        <li><strong>Finish Game:</strong> Ends the session, clears all students, and displays the winner podium on the projector.</li>
+                                        <li><strong>Manual Sync:</strong> Forces a refresh of student scores/data if real-time updates seem stuck.</li>
+                                    </ul>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-sm">4</span>
+                                    Student Experience
+                                </h3>
+                                <div className="pl-11 space-y-2">
+                                    <p>What the students see:</p>
+                                    <ul className="list-disc pl-5 space-y-1">
+                                        <li>Students enter their name to join the lobby.</li>
+                                        <li>When the game starts, questions appear on their device.</li>
+                                        <li>Correct answers earn points. Speed matters!</li>
+                                        <li>After the game, the top 3 students are displayed on the podium.</li>
+                                    </ul>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div className="mt-12 pt-8 border-t border-white/10 flex justify-end">
+                            <Button variant="primary" onClick={() => setIsManualOpen(false)}>
+                                Close Manual
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}
