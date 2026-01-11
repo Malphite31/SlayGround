@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore';
-import { Users, Trophy, Clock, Sparkles, Music, Crown } from 'lucide-react';
+import { Users, Trophy, Clock, Sparkles, Music, Crown, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import confetti from 'canvas-confetti';
@@ -41,15 +41,23 @@ export function HostView() {
     const answeredCount = students.filter(s => s.hasAnswered).length;
 
     // Timer countdown
+    const [showAnswer, setShowAnswer] = useState(false);
+
     // Timer countdown
     useEffect(() => {
         if (status !== 'playing' || !currentProblem) return;
 
         if (timeRemaining === 0) {
-            const timeout = setTimeout(() => {
-                nextStage();
-            }, 1000);
-            return () => clearTimeout(timeout);
+            // Reveal answer logic
+            if (!showAnswer) {
+                setShowAnswer(true);
+                const timeout = setTimeout(() => {
+                    setShowAnswer(false);
+                    nextStage();
+                }, 5000); // Show answer for 5 seconds
+                return () => clearTimeout(timeout);
+            }
+            return;
         }
 
         const interval = setInterval(() => {
@@ -57,7 +65,7 @@ export function HostView() {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [status, timeRemaining, currentProblem, setTimeRemaining, nextStage]);
+    }, [status, timeRemaining, currentProblem, setTimeRemaining, nextStage, showAnswer]);
 
     if (!gamePin) {
         return (
@@ -324,11 +332,27 @@ export function HostView() {
                                 </h2>
                                 {currentProblem.choices && (
                                     <div className="grid grid-cols-2 gap-6 mt-12 max-w-5xl mx-auto w-full">
-                                        {currentProblem.choices.map((choice, index) => (
-                                            <div key={index} className="glass-panel p-8 rounded-3xl border border-white/10 bg-surface/40 flex items-center justify-center text-4xl font-bold text-white shadow-xl">
-                                                {choice}
-                                            </div>
-                                        ))}
+                                        {currentProblem.choices.map((choice, index) => {
+                                            const isCorrect = choice === currentProblem.answer;
+                                            const isDimmed = showAnswer && !isCorrect;
+
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className={`glass-panel p-8 rounded-3xl border transition-all duration-500 flex items-center justify-center text-4xl font-bold shadow-xl
+                                                        ${showAnswer && isCorrect ? 'bg-green-500 text-white border-green-400 scale-105 shadow-[0_0_50px_theme(\'colors.green.500\')] z-20' :
+                                                            isDimmed ? 'opacity-20 bg-surface/40 border-white/5 blur-sm scale-95' :
+                                                                'bg-surface/40 border-white/10 text-white'}`}
+                                                >
+                                                    {choice}
+                                                    {showAnswer && isCorrect && (
+                                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-4 -right-4 bg-green-500 text-white p-2 rounded-full shadow-lg">
+                                                            <CheckCircle2 className="w-8 h-8" />
+                                                        </motion.div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
