@@ -34,9 +34,18 @@ export function HostView() {
         setTimeRemaining,
         nextStage,
         status,
-        startSync, // Added
-        validateGamePin // Added
+        startSync,
+        validateGamePin,
+        checkForActiveGame // Added
     } = useGameStore();
+
+    // Check for active games on mount when no gamePin
+    useEffect(() => {
+        if (!gamePin) {
+            console.log('[HostView] No gamePin, checking for active games');
+            checkForActiveGame();
+        }
+    }, [gamePin, checkForActiveGame]);
 
     // Validate persisted gamePin on mount
     useEffect(() => {

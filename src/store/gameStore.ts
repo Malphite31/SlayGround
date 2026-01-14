@@ -69,6 +69,7 @@ interface GameState {
     stopSync: () => void;
     syncGameState: () => Promise<void>;
     validateGamePin: () => Promise<boolean>;
+    checkForActiveGame: () => Promise<void>; // Check server for active games
 }
 
 export const useGameStore = create<GameState>()(
@@ -449,6 +450,60 @@ export const useGameStore = create<GameState>()(
                     console.error('[Validate] Error validating PIN:', e);
                     // On network error, keep the state for now
                     return true;
+                }
+            },
+
+            checkForActiveGame: async () => {
+                // Check if there's an active game on the server
+                try {
+                    console.log('[CheckActive] Checking for active games on server');
+                    const res = await fetch('/api/game/active');
+
+                    if (!res.ok) {
+                        console.log('[CheckActive] No active games found');
+                        return;
+                    }
+
+                    const data = await res.json() as any;
+
+                    if (!data.game) {
+                        console.log('[CheckActive] No active games');
+                        return;
+                    }
+
+                    const game = data.game;
+                    console.log('[CheckActive] Found active game:', game.pin, 'status:', game.status);
+
+                    // Fetch the quest details
+                    const questId = game.quest_id;
+
+                    // Ensure quests are loaded
+                    if (get().quests.length === 0) {
+                        await get().loadQuests();
+                    }
+
+                    const quest = get().quests.find(q => q.id === questId);
+
+                    if (!quest) {
+                        console.error('[CheckActive] Quest not found:', questId);
+                        return;
+                    }
+
+                    // Set the game state from the server
+                    set({
+                        gamePin: game.pin,
+                        currentQuest: quest,
+                        status: game.status,
+                        isActive: game.status === 'playing',
+                        currentStage: game.current_stage || 1,
+                        totalStages: game.total_stages || 0,
+                    });
+
+                    console.log('[CheckActive] Game state set, starting sync');
+                    get().startSync();
+
+                } catch (e) {
+                    console.error('[CheckActive] Error checking for active game:', e);
                 }
             },
         }),
