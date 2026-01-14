@@ -64,6 +64,7 @@ export function HostView() {
     //Winner screen state (must be at top level, not inside conditional)
     const [showCountdown, setShowCountdown] = useState(true);
     const [countdown, setCountdown] = useState(3);
+    const [showPerformance, setShowPerformance] = useState(false);
 
     // Handle answer reveal and auto-advance when timer reaches 0
     useEffect(() => {
@@ -102,8 +103,20 @@ export function HostView() {
         if (status === 'finished') {
             setShowCountdown(true);
             setCountdown(3);
+            setShowPerformance(false);
         }
     }, [status]);
+
+    // Transition to performance after showing winner podium
+    useEffect(() => {
+        if (status === 'finished' && !showCountdown && !showPerformance) {
+            // Wait 8 seconds after winner appears, then show performance
+            const timer = setTimeout(() => {
+                setShowPerformance(true);
+            }, 8000);
+            return () => clearTimeout(timer);
+        }
+    }, [status, showCountdown, showPerformance]);
 
     if (!gamePin) {
         return (
@@ -231,92 +244,97 @@ export function HostView() {
                     className="absolute inset-0 bg-white z-[100] pointer-events-none"
                 />
 
-                <motion.div
-                    initial={{ opacity: 0, y: -50, scale: 0.8 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                    className="text-center mb-16 relative z-10"
-                >
-                    <div className="flex justify-center mb-4">
+                {/* Show winner podium if performance hasn't started yet */}
+                {!showPerformance && (
+                    <>
                         <motion.div
-                            initial={{ rotate: -180, scale: 0 }}
-                            animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
-                            transition={{
-                                rotate: { duration: 1, ease: "easeOut" },
-                                scale: { duration: 4, repeat: Infinity }
-                            }}
+                            initial={{ opacity: 0, y: -50, scale: 0.8 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                            className="text-center mb-16 relative z-10"
                         >
-                            <Crown className="w-24 h-24 text-yellow-400 drop-shadow-[0_0_20px_rgba(234,179,8,0.8)]" />
+                            <div className="flex justify-center mb-4">
+                                <motion.div
+                                    initial={{ rotate: -180, scale: 0 }}
+                                    animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+                                    transition={{
+                                        rotate: { duration: 1, ease: "easeOut" },
+                                        scale: { duration: 4, repeat: Infinity }
+                                    }}
+                                >
+                                    <Crown className="w-24 h-24 text-yellow-400 drop-shadow-[0_0_20px_rgba(234,179,8,0.8)]" />
+                                </motion.div>
+                            </div>
+                            <h1 className="text-8xl md:text-9xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 drop-shadow-[0_0_30px_rgba(234,179,8,0.5)] leading-none mb-4">
+                                {winners.length > 1 ? 'WINNERS' : 'WINNER'}
+                            </h1>
+                            <p className="text-2xl text-yellow-100/50 font-bold tracking-[0.4em] uppercase">The Slayground Champion</p>
                         </motion.div>
-                    </div>
-                    <h1 className="text-8xl md:text-9xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 drop-shadow-[0_0_30px_rgba(234,179,8,0.5)] leading-none mb-4">
-                        {winners.length > 1 ? 'WINNERS' : 'WINNER'}
-                    </h1>
-                    <p className="text-2xl text-yellow-100/50 font-bold tracking-[0.4em] uppercase">The Slayground Champion</p>
-                </motion.div>
 
-                <div className="flex items-end gap-6 md:gap-12 relative z-10 mb-12 h-64 md:h-80">
-                    {/* 2nd Place */}
-                    {top3[1] && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 50 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ delay: 0.4 }}
-                            className="flex flex-col items-center"
-                        >
-                            <div className="mb-4 text-center">
-                                <div className="text-2xl font-bold text-slate-300 drop-shadow-md">{top3[1].name}</div>
-                                <div className="font-mono text-lg text-slate-400">{top3[1].score} pts</div>
-                            </div>
-                            <div className="w-28 md:w-36 h-32 md:h-40 glass-panel bg-slate-400/10 border-slate-400/30 rounded-t-3xl flex items-center justify-center relative overflow-hidden group">
-                                <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-slate-400/20 to-transparent" />
-                                <span className="text-6xl font-black text-slate-500/20">2</span>
-                            </div>
-                        </motion.div>
-                    )}
+                        <div className="flex items-end gap-6 md:gap-12 relative z-10 mb-12 h-64 md:h-80">
+                            {/* 2nd Place */}
+                            {top3[1] && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9, y: 50 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    transition={{ delay: 0.4 }}
+                                    className="flex flex-col items-center"
+                                >
+                                    <div className="mb-4 text-center">
+                                        <div className="text-2xl font-bold text-slate-300 drop-shadow-md">{top3[1].name}</div>
+                                        <div className="font-mono text-lg text-slate-400">{top3[1].score} pts</div>
+                                    </div>
+                                    <div className="w-28 md:w-36 h-32 md:h-40 glass-panel bg-slate-400/10 border-slate-400/30 rounded-t-3xl flex items-center justify-center relative overflow-hidden group">
+                                        <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-slate-400/20 to-transparent" />
+                                        <span className="text-6xl font-black text-slate-500/20">2</span>
+                                    </div>
+                                </motion.div>
+                            )}
 
-                    {/* 1st Place */}
-                    {top3[0] && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 1.1, y: 50 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="flex flex-col items-center relative z-20"
-                        >
-                            <div className="mb-6 text-center">
-                                <div className="text-5xl md:text-6xl font-black text-yellow-400 mb-2 drop-shadow-[0_0_20px_rgba(234,179,8,0.4)]">{top3[0].name}</div>
-                                <div className="font-mono text-3xl text-white/90 font-black">{top3[0].score} PTS</div>
-                            </div>
-                            <div className="w-36 md:w-48 h-48 md:h-64 glass-panel bg-yellow-500/20 border-yellow-500/50 rounded-t-3xl border-b-0 flex items-center justify-center relative overflow-hidden shadow-[0_0_60px_rgba(234,179,8,0.3)]">
-                                <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/30 via-yellow-500/5 to-transparent animate-pulse" />
-                                <span className="text-8xl font-black text-yellow-500/20 relative z-10">1</span>
-                                <div className="absolute top-0 w-full h-1 bg-yellow-300/50" />
-                            </div>
-                        </motion.div>
-                    )}
+                            {/* 1st Place */}
+                            {top3[0] && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 1.1, y: 50 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="flex flex-col items-center relative z-20"
+                                >
+                                    <div className="mb-6 text-center">
+                                        <div className="text-5xl md:text-6xl font-black text-yellow-400 mb-2 drop-shadow-[0_0_20px_rgba(234,179,8,0.4)]">{top3[0].name}</div>
+                                        <div className="font-mono text-3xl text-white/90 font-black">{top3[0].score} PTS</div>
+                                    </div>
+                                    <div className="w-36 md:w-48 h-48 md:h-64 glass-panel bg-yellow-500/20 border-yellow-500/50 rounded-t-3xl border-b-0 flex items-center justify-center relative overflow-hidden shadow-[0_0_60px_rgba(234,179,8,0.3)]">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/30 via-yellow-500/5 to-transparent animate-pulse" />
+                                        <span className="text-8xl font-black text-yellow-500/20 relative z-10">1</span>
+                                        <div className="absolute top-0 w-full h-1 bg-yellow-300/50" />
+                                    </div>
+                                </motion.div>
+                            )}
 
-                    {/* 3rd Place */}
-                    {top3[2] && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 50 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ delay: 0.6 }}
-                            className="flex flex-col items-center"
-                        >
-                            <div className="mb-4 text-center">
-                                <div className="text-2xl font-bold text-orange-200 drop-shadow-md">{top3[2].name}</div>
-                                <div className="font-mono text-lg text-orange-400">{top3[2].score} pts</div>
-                            </div>
-                            <div className="w-28 md:w-36 h-24 md:h-32 glass-panel bg-orange-500/10 border-orange-500/30 rounded-t-3xl flex items-center justify-center relative overflow-hidden shadow-inner">
-                                <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-orange-500/20 to-transparent" />
-                                <span className="text-6xl font-black text-orange-500/20">3</span>
-                            </div>
-                        </motion.div>
-                    )}
-                </div>
+                            {/* 3rd Place */}
+                            {top3[2] && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9, y: 50 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    transition={{ delay: 0.6 }}
+                                    className="flex flex-col items-center"
+                                >
+                                    <div className="mb-4 text-center">
+                                        <div className="text-2xl font-bold text-orange-200 drop-shadow-md">{top3[2].name}</div>
+                                        <div className="font-mono text-lg text-orange-400">{top3[2].score} pts</div>
+                                    </div>
+                                    <div className="w-28 md:w-36 h-24 md:h-32 glass-panel bg-orange-500/10 border-orange-500/30 rounded-t-3xl flex items-center justify-center relative overflow-hidden shadow-inner">
+                                        <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-orange-500/20 to-transparent" />
+                                        <span className="text-6xl font-black text-orange-500/20">3</span>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
+                    </>
+                )}
 
-                {/* FINAL PERFORMANCE OVERLAY - Optimized for space */}
-                {currentQuest?.problems.some(p => p.move) && (
+                {/* FINAL PERFORMANCE - Show only after podium */}
+                {showPerformance && currentQuest?.problems.some(p => p.move) && (
                     <motion.div
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
