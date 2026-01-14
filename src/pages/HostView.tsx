@@ -61,29 +61,37 @@ export function HostView() {
     // Timer countdown
     const [showAnswer, setShowAnswer] = useState(false);
 
-    // Timer countdown
+    // Handle answer reveal and auto-advance when timer reaches 0
     useEffect(() => {
-        if (status !== 'playing' || !currentProblem) return;
+        if (status !== 'playing' || !currentProblem || timeRemaining !== 0) return;
 
-        if (timeRemaining === 0) {
-            // Reveal answer logic
-            if (!showAnswer) {
-                setShowAnswer(true);
-                const timeout = setTimeout(() => {
-                    setShowAnswer(false);
-                    nextStage();
-                }, 5000); // Show answer for 5 seconds
-                return () => clearTimeout(timeout);
-            }
-            return;
-        }
+        // Reveal answer
+        setShowAnswer(true);
+
+        // After 5 seconds, advance to next stage
+        const timeout = setTimeout(() => {
+            setShowAnswer(false);
+            nextStage();
+        }, 5000);
+
+        return () => clearTimeout(timeout);
+    }, [status, currentProblem, timeRemaining]); // Removed showAnswer from dependencies
+
+    // Timer countdown interval
+    useEffect(() => {
+        if (status !== 'playing' || !currentProblem || timeRemaining === 0) return;
 
         const interval = setInterval(() => {
             setTimeRemaining(Math.max(0, timeRemaining - 1));
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [status, timeRemaining, currentProblem, setTimeRemaining, nextStage, showAnswer]);
+    }, [status, timeRemaining, currentProblem, setTimeRemaining]);
+
+    // Reset showAnswer when stage changes
+    useEffect(() => {
+        setShowAnswer(false);
+    }, [currentStage]);
 
     if (!gamePin) {
         return (
