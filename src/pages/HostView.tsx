@@ -101,18 +101,18 @@ export function HostView() {
     // Reset countdown when game finishes
     useEffect(() => {
         if (status === 'finished') {
-            setShowCountdown(true);
+            setShowCountdown(false); // Start with NO countdown
             setCountdown(3);
             setShowPerformance(false);
         }
     }, [status]);
 
-    // Transition to performance after showing winner podium
+    // Transition to countdown before performance
     useEffect(() => {
         if (status === 'finished' && !showCountdown && !showPerformance) {
-            // Wait 8 seconds after winner appears, then show performance
+            // Wait 8 seconds after winner appears, then show countdown
             const timer = setTimeout(() => {
-                setShowPerformance(true);
+                setShowCountdown(true); // Show countdown before performance
             }, 8000);
             return () => clearTimeout(timer);
         }
@@ -146,15 +146,20 @@ export function HostView() {
         const top3 = sortedStudents.slice(0, 3);
         const winners = sortedStudents.filter(s => s.score === top3[0]?.score);
 
-        // Countdown timer
+        // Countdown timer - triggers performance after countdown finishes
         useEffect(() => {
+            if (!showCountdown) return; // Only run if countdown is showing
+
             if (countdown > 0) {
                 const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
                 return () => clearTimeout(timer);
             } else if (countdown === 0) {
-                setTimeout(() => setShowCountdown(false), 500);
+                setTimeout(() => {
+                    setShowCountdown(false);
+                    setShowPerformance(true); // Show performance after countdown
+                }, 500);
             }
-        }, [countdown]);
+        }, [countdown, showCountdown]);
 
         // Fire realistic fireworks loop
         useEffect(() => {
@@ -180,8 +185,8 @@ export function HostView() {
             return () => clearInterval(interval);
         }, []);
 
-        // Show countdown screen first
-        if (showCountdown) {
+        // Show countdown before performance transition (if has moves)
+        if (showCountdown && currentQuest?.problems.some(p => p.move)) {
             return (
                 <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
                     <div className="bg-mesh opacity-30 absolute inset-0" />
