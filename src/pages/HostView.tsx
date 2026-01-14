@@ -61,6 +61,10 @@ export function HostView() {
     // Timer countdown
     const [showAnswer, setShowAnswer] = useState(false);
 
+    //Winner screen state (must be at top level, not inside conditional)
+    const [showCountdown, setShowCountdown] = useState(true);
+    const [countdown, setCountdown] = useState(3);
+
     // Handle answer reveal and auto-advance when timer reaches 0
     useEffect(() => {
         if (status !== 'playing' || !currentProblem || timeRemaining !== 0) return;
@@ -93,6 +97,14 @@ export function HostView() {
         setShowAnswer(false);
     }, [currentStage]);
 
+    // Reset countdown when game finishes
+    useEffect(() => {
+        if (status === 'finished') {
+            setShowCountdown(true);
+            setCountdown(3);
+        }
+    }, [status]);
+
     if (!gamePin) {
         return (
             <div className="flex flex-col items-center justify-center h-screen text-center px-4 relative overflow-hidden">
@@ -120,8 +132,6 @@ export function HostView() {
         const sortedStudents = [...students].sort((a, b) => b.score - a.score);
         const top3 = sortedStudents.slice(0, 3);
         const winners = sortedStudents.filter(s => s.score === top3[0]?.score);
-        const [showCountdown, setShowCountdown] = useState(true);
-        const [countdown, setCountdown] = useState(3);
 
         // Countdown timer
         useEffect(() => {
