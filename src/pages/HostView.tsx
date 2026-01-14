@@ -412,7 +412,7 @@ export function HostView() {
     };
 
     // Waiting Screen with QR Code (before game starts)
-    if (status !== 'playing' && status !== 'finished') {
+    if (status === 'idle' || status === 'paused') {
         const joinUrl = `${window.location.origin}/join/${gamePin}`;
 
         return (
