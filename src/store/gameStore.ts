@@ -508,9 +508,10 @@ export const useGameStore = create<GameState>()(
                         isActive: game.status === 'playing',
                         currentStage: game.current_stage || 1,
                         totalStages: game.total_stages || 0,
+                        students: [], // Clear old students when switching games
                     });
 
-                    console.log('[CheckActive] Game state set, starting sync');
+                    console.log('[CheckActive] Switched to new game, starting sync');
                     get().startSync();
 
                 } catch (e) {
