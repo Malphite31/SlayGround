@@ -150,8 +150,20 @@ export function HostView() {
         hasGamePin: !!gamePin,
         isPlaying: status === 'playing',
         isFinished: status === 'finished',
-        shouldShowWaiting: gamePin && status !== 'playing' && status !== 'finished'
+        shouldShowWaiting: gamePin && status !== 'playing' && status !== 'finished',
+        timeRemaining,
+        showAnswer,
+        showCountdown,
+        showPerformance
     });
+
+    // Log when status changes to finished
+    useEffect(() => {
+        if (status === 'finished') {
+            console.log('[HostView] 🏆 GAME FINISHED - Showing winner view');
+            console.log('[HostView] Students:', students.map(s => ({ name: s.name, score: s.score })));
+        }
+    }, [status, students]);
 
     if (!gamePin) {
         return (
