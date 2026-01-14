@@ -19,7 +19,6 @@ export function AdminDashboard() {
         pauseGame,
         nextStage,
         deleteQuest,
-        removeBots,
         isQRVisible, // Added
         toggleQR, // Added
         startSync, // Added
@@ -64,11 +63,7 @@ export function AdminDashboard() {
 
 
 
-    const handleClearBots = () => {
-        if (confirm('Remove all simulated bots?')) {
-            removeBots();
-        }
-    };
+
 
     const handleCopyLink = () => {
         const url = `${window.location.origin}/play?pin=${gamePin}`;
@@ -214,18 +209,16 @@ export function AdminDashboard() {
                                 Link
                             </Button>
 
-                            <div className="h-6 md:h-8 w-px bg-white/10 mx-1 md:mx-2 flex-shrink-0"></div>
+                            {isActive && (
+                                <>
+                                    <div className="h-6 md:h-8 w-px bg-white/10 mx-1 md:mx-2 flex-shrink-0"></div>
 
-
-                            <Button variant="ghost" onClick={handleClearBots} className="rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 bg-black/20 border-dashed border border-red-500/20">
-                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
-                                Clear
-                            </Button>
-
-                            <Button variant="ghost" onClick={finishGame} className="rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 bg-black/20 border-dashed border border-red-500/20">
-                                <span className="md:hidden">Finish</span>
-                                <span className="hidden md:inline">Finish Game</span>
-                            </Button>
+                                    <Button variant="ghost" onClick={finishGame} className="rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 bg-black/20 border-dashed border border-red-500/20">
+                                        <span className="md:hidden">Finish</span>
+                                        <span className="hidden md:inline">Finish Game</span>
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
