@@ -90,13 +90,16 @@ export const useGameStore = create<GameState>()(
                 const quest = get().quests.find(q => q.id === questId);
                 if (!quest) return;
 
+                // Stop any existing sync to prevent race conditions
+                get().stopSync();
+
                 // Use quest's custom timer duration or default to 30 seconds
                 const duration = quest.timerDuration || timerDuration || 30;
 
                 // Generate random 4-digit PIN
                 const pin = Math.floor(1000 + Math.random() * 9000).toString();
 
-                // Call API
+                // Call API and wait for response
                 try {
                     const res = await fetch('/api/game/create', {
                         method: 'POST',
@@ -113,12 +116,17 @@ export const useGameStore = create<GameState>()(
                         alert(`Failed to create game: ${err.error || 'Unknown error'}`);
                         return;
                     }
+
+                    // Wait a moment for the database to commit
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
                 } catch (e) {
                     console.error("Failed to create game on server", e);
                     alert("Network error: Could not reach game server.");
                     return;
                 }
 
+                // Set local state AFTER API succeeds
                 set({
                     gamePin: pin,
                     currentQuest: quest,
@@ -131,6 +139,7 @@ export const useGameStore = create<GameState>()(
                     timeRemaining: duration,
                 });
 
+                // Start sync to get fresh data from server
                 get().startSync();
             },
 
