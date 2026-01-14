@@ -118,6 +118,9 @@ export function HostView() {
         }
     }, [status, showCountdown, showPerformance]);
 
+    // Debug logging
+    console.log('[HostView] gamePin:', gamePin, 'status:', status, 'currentQuest:', currentQuest?.title);
+
     if (!gamePin) {
         return (
             <div className="flex flex-col items-center justify-center h-screen text-center px-4 relative overflow-hidden">
