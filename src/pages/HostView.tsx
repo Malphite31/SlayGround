@@ -47,6 +47,16 @@ export function HostView() {
         }
     }, [gamePin, checkForActiveGame]);
 
+    // Periodically check for newer active games every 5 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            console.log('[HostView] Periodic check for active games');
+            checkForActiveGame();
+        }, 5000); // Check every 5 seconds
+
+        return () => clearInterval(interval);
+    }, [checkForActiveGame]);
+
     // Validate persisted gamePin on mount
     useEffect(() => {
         validateGamePin();
