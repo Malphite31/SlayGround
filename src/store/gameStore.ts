@@ -526,10 +526,9 @@ export const useGameStore = create<GameState>()(
 
                 // Don't persist gamePin and currentQuest if:
                 // - Game is finished
-                // - Game is currently playing (to prevent stale active games)
                 // - Game is idle with no students
+                // Note: DO persist playing games so they don't get cleared mid-game
                 const shouldClearGame = state.status === 'finished' ||
-                    state.status === 'playing' ||
                     (state.status === 'idle' && state.students.length === 0);
 
                 return {
