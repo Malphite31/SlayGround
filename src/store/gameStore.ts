@@ -90,8 +90,20 @@ export const useGameStore = create<GameState>()(
                 const quest = get().quests.find(q => q.id === questId);
                 if (!quest) return;
 
-                // Stop any existing sync to prevent race conditions
+                // FIRST: Stop any existing sync and completely clear old game state
                 get().stopSync();
+
+                // Clear ALL old game state immediately to prevent any persistence issues
+                set({
+                    gamePin: null,
+                    currentQuest: null,
+                    status: 'idle',
+                    isActive: false,
+                    currentStage: 0,
+                    totalStages: 0,
+                    students: [],
+                    timeRemaining: 30,
+                });
 
                 // Use quest's custom timer duration or default to 30 seconds
                 const duration = quest.timerDuration || timerDuration || 30;
@@ -118,7 +130,7 @@ export const useGameStore = create<GameState>()(
                     }
 
                     // Wait a moment for the database to commit
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await new Promise(resolve => setTimeout(resolve, 200));
 
                 } catch (e) {
                     console.error("Failed to create game on server", e);
@@ -126,7 +138,7 @@ export const useGameStore = create<GameState>()(
                     return;
                 }
 
-                // Set local state AFTER API succeeds
+                // Set NEW game state
                 set({
                     gamePin: pin,
                     currentQuest: quest,
@@ -138,6 +150,8 @@ export const useGameStore = create<GameState>()(
                     timerDuration: duration,
                     timeRemaining: duration,
                 });
+
+                console.log('[CreateGame] New game created:', { pin, status: 'idle', currentStage: 1 });
 
                 // Start sync to get fresh data from server
                 get().startSync();
