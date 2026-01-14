@@ -432,16 +432,16 @@ export function HostView() {
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-center relative z-10 max-w-4xl"
+                    className="text-center relative z-10 max-w-4xl w-full"
                 >
                     <h1 className="text-6xl md:text-8xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary mb-4">
-                        {currentQuest?.title}
+                        {currentQuest?.title || 'Loading Quest...'}
                     </h1>
                     <p className="text-2xl text-slate-400 mb-12 font-medium">
                         Scan the QR code or visit the link to join!
                     </p>
 
-                    <div className="glass-panel p-12 rounded-[3rem] border-white/10 shadow-2xl mb-8 inline-block">
+                    <div className="glass-panel p-12 rounded-[3rem] border-white/10 shadow-2xl mb-8 inline-block bg-white">
                         <QRCode value={joinUrl} size={300} level="H" />
                     </div>
 
