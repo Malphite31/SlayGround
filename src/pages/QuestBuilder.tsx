@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { ArrowLeft, Plus, Trash2, Save, FileEdit, HelpCircle, Variable, CheckSquare } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Save, FileEdit, HelpCircle, Variable, CheckSquare, Music, CheckCircle2 } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 
 type QuestionType = 'multiple-choice' | 'fill-blank' | 'true-false' | 'short-answer';
@@ -11,6 +11,8 @@ interface Problem {
     answer: string;
     type: QuestionType;
     choices?: string[];
+    move?: string;
+    songPart?: string;
 }
 
 export function QuestBuilder() {
@@ -23,8 +25,9 @@ export function QuestBuilder() {
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [musicUrl, setMusicUrl] = useState('');
     const [problems, setProblems] = useState<Problem[]>([
-        { question: '', answer: '', type: 'multiple-choice', choices: ['', '', '', ''] },
+        { question: '', answer: '', type: 'multiple-choice', choices: ['', '', '', ''], move: '', songPart: '' },
     ]);
 
     // Load existing quest data in edit mode
@@ -32,11 +35,14 @@ export function QuestBuilder() {
         if (existingQuest) {
             setTitle(existingQuest.title);
             setDescription(existingQuest.description);
+            setMusicUrl(existingQuest.musicUrl || '');
             setProblems(existingQuest.problems.map(p => ({
                 question: p.question,
                 answer: p.answer,
                 type: p.type,
                 choices: p.choices || (p.type === 'true-false' ? ['True', 'False'] : p.type === 'multiple-choice' ? ['', '', '', ''] : undefined),
+                move: p.move || '',
+                songPart: p.songPart || '',
             })));
         }
     }, [existingQuest]);
@@ -44,7 +50,7 @@ export function QuestBuilder() {
     const addProblem = () => {
         setProblems([
             ...problems,
-            { question: '', answer: '', type: 'multiple-choice', choices: ['', '', '', ''] }
+            { question: '', answer: '', type: 'multiple-choice', choices: ['', '', '', ''], move: '', songPart: '' }
         ]);
     };
 
@@ -103,12 +109,15 @@ export function QuestBuilder() {
         const questData = {
             title,
             description,
+            musicUrl: musicUrl.trim() || undefined,
             problems: problems.map((p, i) => ({
                 question: p.question,
                 answer: p.answer,
                 type: p.type,
                 choices: p.choices,
                 stage: i + 1,
+                move: p.move?.trim() || undefined,
+                songPart: p.songPart?.trim() || undefined,
             })),
         };
 
@@ -167,6 +176,26 @@ export function QuestBuilder() {
                             className="w-full bg-surface border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all placeholder:text-slate-600 focus:bg-surface/80"
                         />
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-2">
+                        <Music className="w-4 h-4 text-primary" />
+                        YouTube Music URL (Optional)
+                    </label>
+                    <input
+                        type="url"
+                        value={musicUrl}
+                        onChange={(e) => setMusicUrl(e.target.value)}
+                        placeholder="https://www.youtube.com/watch?v=... (for final performance)"
+                        className="w-full bg-surface border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all placeholder:text-slate-600 focus:bg-surface/80 font-mono text-sm"
+                    />
+                    {musicUrl && (
+                        <p className="text-xs text-green-400 ml-1 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Music will play during final performance
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -285,6 +314,43 @@ export function QuestBuilder() {
                                 className="w-full bg-green-500/5 border border-green-500/30 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/20 transition-all placeholder:text-green-500/30"
                             />
                         </div>
+
+                        {/* Dance Move Fields */}
+                        <div className="grid md:grid-cols-2 gap-4 bg-yellow-500/5 p-4 rounded-xl border border-yellow-500/20">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-yellow-400 uppercase tracking-wider ml-1 flex items-center gap-1">
+                                    <Music className="w-3 h-3" />
+                                    Dance Move (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    value={problem.move || ''}
+                                    onChange={(e) => updateProblem(index, 'move', e.target.value)}
+                                    placeholder="e.g., Moonwalk, Spin, Wave..."
+                                    className="w-full bg-background border border-yellow-500/30 rounded-xl p-3 text-white focus:outline-none focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/20 transition-all placeholder:text-slate-600"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-yellow-400 uppercase tracking-wider ml-1">
+                                    Song Part (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    value={problem.songPart || ''}
+                                    onChange={(e) => updateProblem(index, 'songPart', e.target.value)}
+                                    placeholder="e.g., Verse 1, Chorus..."
+                                    className="w-full bg-background border border-yellow-500/30 rounded-xl p-3 text-white focus:outline-none focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/20 transition-all placeholder:text-slate-600"
+                                />
+                            </div>
+                            {problem.move && (
+                                <div className="md:col-span-2">
+                                    <p className="text-xs text-yellow-400 flex items-center gap-1">
+                                        <CheckCircle2 className="w-3 h-3" />
+                                        This move will be unlocked when students answer correctly
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
@@ -304,6 +370,6 @@ export function QuestBuilder() {
                     </Button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

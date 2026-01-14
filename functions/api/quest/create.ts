@@ -8,7 +8,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (corsResponse) return corsResponse;
 
     try {
-        const { title, description, problems } = await request.json() as any;
+        const { title, description, problems, musicUrl } = await request.json() as any;
 
         if (!title || !description || !problems) {
             return errorResponse('Missing required fields: title, description, problems');
@@ -19,8 +19,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // Insert quest
         const { success } = await env.DB.prepare(
-            `INSERT INTO quests (id, title, description, problems) VALUES (?, ?, ?, ?)`
-        ).bind(id, title, description, problemsJson).run();
+            `INSERT INTO quests (id, title, description, problems, music_url) VALUES (?, ?, ?, ?, ?)`
+        ).bind(id, title, description, problemsJson, musicUrl || null).run();
 
         if (!success) {
             return errorResponse('Failed to create quest', 500);

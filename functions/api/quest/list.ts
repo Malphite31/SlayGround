@@ -15,6 +15,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         const parsedQuests = quests.map((q: any) => ({
             ...q,
             problems: JSON.parse(q.problems),
+            musicUrl: q.music_url,
             createdAt: q.created_at,
             updatedAt: q.updated_at
         }));

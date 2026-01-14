@@ -27,6 +27,7 @@ interface Quest {
     title: string;
     description: string;
     problems: Problem[];
+    musicUrl?: string; // YouTube video URL for final performance
     createdAt: number;
     updatedAt: number;
 }

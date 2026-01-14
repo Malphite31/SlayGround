@@ -25,6 +25,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         const parsedQuest = {
             ...quest,
             problems: JSON.parse(quest.problems as string),
+            musicUrl: quest.music_url,
             createdAt: quest.created_at,
             updatedAt: quest.updated_at
         };

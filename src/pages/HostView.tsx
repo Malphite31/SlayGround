@@ -5,6 +5,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import confetti from 'canvas-confetti';
 
+// Helper function to extract YouTube video ID from URL
+function getYouTubeVideoId(url: string): string | null {
+    try {
+        const urlObj = new URL(url);
+        // Handle youtube.com/watch?v=VIDEO_ID
+        if (urlObj.hostname.includes('youtube.com')) {
+            return urlObj.searchParams.get('v');
+        }
+        // Handle youtu.be/VIDEO_ID
+        if (urlObj.hostname.includes('youtu.be')) {
+            return urlObj.pathname.slice(1);
+        }
+    } catch {
+        return null;
+    }
+    return null;
+}
+
 export function HostView() {
     const {
         gamePin,
@@ -94,6 +112,18 @@ export function HostView() {
         const sortedStudents = [...students].sort((a, b) => b.score - a.score);
         const top3 = sortedStudents.slice(0, 3);
         const winners = sortedStudents.filter(s => s.score === top3[0]?.score);
+        const [showCountdown, setShowCountdown] = useState(true);
+        const [countdown, setCountdown] = useState(3);
+
+        // Countdown timer
+        useEffect(() => {
+            if (countdown > 0) {
+                const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+                return () => clearTimeout(timer);
+            } else if (countdown === 0) {
+                setTimeout(() => setShowCountdown(false), 500);
+            }
+        }, [countdown]);
 
         // Fire realistic fireworks loop
         useEffect(() => {
@@ -118,6 +148,54 @@ export function HostView() {
 
             return () => clearInterval(interval);
         }, []);
+
+        // Show countdown screen first
+        if (showCountdown) {
+            return (
+                <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
+                    <div className="bg-mesh opacity-30 absolute inset-0" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-background to-background" />
+
+                    <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="text-center relative z-10"
+                    >
+                        <motion.h1
+                            initial={{ y: -50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-7xl md:text-9xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent mb-12 leading-tight"
+                        >
+                            GET READY TO<br />SHOW YOUR MOVES!
+                        </motion.h1>
+
+                        {countdown > 0 && (
+                            <motion.div
+                                key={countdown}
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                exit={{ scale: 0, rotate: 180 }}
+                                transition={{ type: "spring", stiffness: 200 }}
+                                className="text-[20rem] font-black text-primary drop-shadow-[0_0_50px_rgba(139,92,246,0.5)]"
+                            >
+                                {countdown}
+                            </motion.div>
+                        )}
+
+                        {countdown === 0 && (
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: [0, 1.2, 1] }}
+                                className="text-9xl font-black text-yellow-400 drop-shadow-[0_0_50px_rgba(234,179,8,0.8)]"
+                            >
+                                LET'S GO!
+                            </motion.div>
+                        )}
+                    </motion.div>
+                </div>
+            );
+        }
 
         return (
             <div className="min-h-screen overflow-y-auto overflow-x-hidden flex flex-col items-center relative p-8 bg-background">
@@ -225,7 +303,7 @@ export function HostView() {
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1 }}
-                        className="glass-panel p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border-primary/30 bg-primary/5 max-w-5xl w-full relative z-10 shadow-2xl backdrop-blur-md"
+                        className="glass-panel p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border-primary/30 bg-primary/5 max-w-6xl w-full relative z-10 shadow-2xl backdrop-blur-md"
                     >
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-4">
@@ -242,13 +320,29 @@ export function HostView() {
                             </div>
                         </div>
 
+                        {/* YouTube Player if music URL exists */}
+                        {currentQuest.musicUrl && getYouTubeVideoId(currentQuest.musicUrl) && (
+                            <div className="mb-6 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-2xl">
+                                <iframe
+                                    width="100%"
+                                    height="315"
+                                    src={`https://www.youtube.com/embed/${getYouTubeVideoId(currentQuest.musicUrl)}?autoplay=1&mute=0`}
+                                    title="Performance Music"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    className="w-full"
+                                />
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-4 gap-4 md:gap-6">
                             {currentQuest.problems.filter(p => p.move).map((p, i) => (
                                 <motion.div
                                     key={i}
                                     initial={{ scale: 0.8, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    transition={{ delay: 1.2 + (i * 0.1) }}
+                                    transition={{ delay: 1.2 + (i * 0.15) }}
                                     className="bg-white/5 p-4 md:p-5 rounded-2xl border border-white/10 text-center hover:bg-white/10 transition-colors group cursor-default"
                                 >
                                     <div className="text-primary text-[10px] font-black tracking-widest uppercase mb-1 opacity-50 group-hover:opacity-100 transition-opacity">Step {i + 1}</div>

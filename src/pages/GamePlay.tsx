@@ -381,25 +381,56 @@ export function GamePlay() {
                             </motion.div>
                         )}
 
-                        {feedback === 'correct' && currentProblem.move && (
-                            <motion.div
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.6 }}
-                                className="mt-8 bg-white/20 backdrop-blur-md p-6 rounded-2xl border border-white/30 text-center shadow-xl"
-                            >
-                                <div className="flex items-center justify-center gap-3 mb-2">
-                                    <Music className="w-6 h-6 text-yellow-300 animate-bounce" />
-                                    <span className="text-yellow-300 font-black text-xs uppercase tracking-widest">Unlock Info</span>
-                                </div>
-                                <h3 className="text-2xl font-black text-white mb-1">
-                                    {currentProblem.move}
-                                </h3>
-                                <p className="text-white/70 text-sm font-medium">
-                                    {currentProblem.songPart}
-                                </p>
-                            </motion.div>
-                        )}
+                        {feedback === 'correct' && currentProblem.move && (() => {
+                            // Fire confetti for unlock
+                            useEffect(() => {
+                                confetti({
+                                    particleCount: 100,
+                                    spread: 70,
+                                    origin: { y: 0.6 }
+                                });
+                            }, []);
+
+                            return (
+                                <motion.div
+                                    initial={{ y: 20, opacity: 0, scale: 0.8 }}
+                                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
+                                    className="mt-8 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 backdrop-blur-md p-8 rounded-3xl border-2 border-yellow-400/50 text-center shadow-2xl relative overflow-hidden"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 animate-pulse" />
+
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: [0, 1.2, 1] }}
+                                        transition={{ delay: 0.7, duration: 0.5 }}
+                                        className="flex items-center justify-center gap-3 mb-4"
+                                    >
+                                        <Music className="w-8 h-8 text-yellow-300 animate-bounce" />
+                                        <span className="text-yellow-300 font-black text-sm uppercase tracking-widest">Move Unlocked!</span>
+                                        <Music className="w-8 h-8 text-yellow-300 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ delay: 0.9, type: "spring" }}
+                                        className="bg-yellow-400/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 border-2 border-yellow-400"
+                                    >
+                                        <span className="text-3xl font-black text-yellow-300">#{currentStage}</span>
+                                    </motion.div>
+
+                                    <h3 className="text-4xl font-black text-white mb-2 drop-shadow-lg">
+                                        {currentProblem.move}
+                                    </h3>
+                                    {currentProblem.songPart && (
+                                        <p className="text-white/80 text-lg font-bold">
+                                            {currentProblem.songPart}
+                                        </p>
+                                    )}
+                                </motion.div>
+                            );
+                        })()}
                     </motion.div>
                 )}
             </AnimatePresence>

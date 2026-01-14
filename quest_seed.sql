@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS quests (
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   problems TEXT NOT NULL, -- JSON array of problems
+  music_url TEXT, -- YouTube URL for final performance
   created_at INTEGER DEFAULT (strftime('%s', 'now')),
   updated_at INTEGER DEFAULT (strftime('%s', 'now'))
 );
