@@ -158,7 +158,17 @@ export const useGameStore = create<GameState>()(
                 }
             },
 
-            startGame: () => set({ status: 'playing', isActive: true, isQRVisible: false }),
+            startGame: async () => {
+                const pin = get().gamePin;
+                if (pin) {
+                    // Update server status
+                    fetch('/api/game/update', {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'start_game', pin })
+                    }).catch(console.error);
+                }
+                set({ status: 'playing', isActive: true, isQRVisible: false });
+            },
             pauseGame: () => set({ status: 'paused', isActive: false }),
 
             finishGame: async () => {

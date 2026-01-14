@@ -26,6 +26,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
             if (!success) return errorResponse('Failed to update stage', 500);
 
+        } else if (action === 'start_game') {
+            const { success } = await env.DB.prepare(
+                `UPDATE games SET status = 'playing' WHERE pin = ?`
+            ).bind(pin).run();
+
+            if (!success) return errorResponse('Failed to start game', 500);
+
         } else if (action === 'finish_game') {
             const { success } = await env.DB.prepare(
                 `UPDATE games SET status = 'finished' WHERE pin = ?`
