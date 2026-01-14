@@ -411,6 +411,64 @@ export function HostView() {
         return 'text-red-500';
     };
 
+    // Waiting Screen with QR Code (before game starts)
+    if (status !== 'playing' && status !== 'finished') {
+        const joinUrl = `${window.location.origin}/join/${gamePin}`;
+
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-background p-8">
+                <div className="bg-mesh opacity-30 absolute inset-0" />
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-background to-background" />
+
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center relative z-10 max-w-4xl"
+                >
+                    <h1 className="text-6xl md:text-8xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary mb-4">
+                        {currentQuest?.title}
+                    </h1>
+                    <p className="text-2xl text-slate-400 mb-12 font-medium">
+                        Scan the QR code or visit the link to join!
+                    </p>
+
+                    <div className="glass-panel p-12 rounded-[3rem] border-white/10 shadow-2xl mb-8 inline-block">
+                        <QRCode value={joinUrl} size={300} level="H" />
+                    </div>
+
+                    <div className="glass-panel px-8 py-4 rounded-2xl border-primary/30 bg-primary/5 inline-block mb-8">
+                        <p className="text-4xl font-mono font-black text-white tracking-wider">
+                            PIN: {gamePin}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-4 mb-8">
+                        <Users className="w-8 h-8 text-primary" />
+                        <p className="text-3xl font-black text-white">
+                            {students.length} {students.length === 1 ? 'Student' : 'Students'} Joined
+                        </p>
+                    </div>
+
+                    {students.length > 0 && (
+                        <div className="glass-panel p-6 rounded-2xl max-w-2xl mx-auto">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {students.map((student) => (
+                                    <div key={student.id} className="bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                                        <p className="text-white font-bold truncate">{student.name}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <p className="text-slate-500 mt-8 text-lg">
+                        Waiting for teacher to start the game...
+                    </p>
+                </motion.div>
+            </div>
+        );
+    }
+
     return (
         <div className="h-screen overflow-hidden flex flex-col p-8 relative">
             <div className="absolute inset-0 bg-gradient-to-b from-background via-[#0f1020] to-background -z-20"></div>
