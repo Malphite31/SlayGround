@@ -408,10 +408,14 @@ export const useGameStore = create<GameState>()(
         }),
         {
             name: 'slayground-storage',
-            partialize: (state) => ({
-                ...state,
-                syncInterval: null // Do not persist interval ID
-            }),
+            partialize: (state) => {
+                const { status, syncInterval, ...rest } = state;
+                return {
+                    ...rest,
+                    syncInterval: null, // Do not persist interval ID
+                    // Do not persist status - always start fresh and sync from server
+                };
+            },
         }
     )
 );
