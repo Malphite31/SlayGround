@@ -28,6 +28,7 @@ interface Quest {
     description: string;
     problems: Problem[];
     musicUrl?: string; // YouTube video URL for final performance
+    timerDuration?: number; // Custom timer duration in seconds (default 30)
     createdAt: number;
     updatedAt: number;
 }
@@ -87,9 +88,12 @@ export const useGameStore = create<GameState>()(
             isQRVisible: false,
             syncInterval: null,
 
-            createGame: async (questId, timerDuration = 30) => {
+            createGame: async (questId, timerDuration) => {
                 const quest = get().quests.find(q => q.id === questId);
                 if (!quest) return;
+
+                // Use quest's custom timer duration or default to 30 seconds
+                const duration = quest.timerDuration || timerDuration || 30;
 
                 // Generate random 4-digit PIN
                 const pin = Math.floor(1000 + Math.random() * 9000).toString();
@@ -125,8 +129,8 @@ export const useGameStore = create<GameState>()(
                     currentStage: 1,
                     totalStages: quest.problems.length,
                     students: [],
-                    timerDuration,
-                    timeRemaining: timerDuration,
+                    timerDuration: duration,
+                    timeRemaining: duration,
                     isQRVisible: true,
                 });
 

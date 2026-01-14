@@ -8,7 +8,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (corsResponse) return corsResponse;
 
     try {
-        const { id, title, description, problems, musicUrl } = await request.json() as any;
+        const { id, title, description, problems, musicUrl, timerDuration } = await request.json() as any;
 
         if (!id || !title || !description || !problems) {
             return errorResponse('Missing required fields: id, title, description, problems');
@@ -18,8 +18,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // Update quest
         const { success } = await env.DB.prepare(
-            `UPDATE quests SET title = ?, description = ?, problems = ?, music_url = ?, updated_at = strftime('%s', 'now') WHERE id = ?`
-        ).bind(title, description, problemsJson, musicUrl || null, id).run();
+            `UPDATE quests SET title = ?, description = ?, problems = ?, music_url = ?, timer_duration = ?, updated_at = strftime('%s', 'now') WHERE id = ?`
+        ).bind(title, description, problemsJson, musicUrl || null, timerDuration || 30, id).run();
 
         if (!success) {
             return errorResponse('Failed to update quest', 500);

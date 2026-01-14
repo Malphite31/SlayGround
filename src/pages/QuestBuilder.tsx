@@ -26,6 +26,7 @@ export function QuestBuilder() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [musicUrl, setMusicUrl] = useState('');
+    const [timerDuration, setTimerDuration] = useState(30);
     const [problems, setProblems] = useState<Problem[]>([
         { question: '', answer: '', type: 'multiple-choice', choices: ['', '', '', ''], move: '', songPart: '' },
     ]);
@@ -36,6 +37,7 @@ export function QuestBuilder() {
             setTitle(existingQuest.title);
             setDescription(existingQuest.description);
             setMusicUrl(existingQuest.musicUrl || '');
+            setTimerDuration(existingQuest.timerDuration || 30);
             setProblems(existingQuest.problems.map(p => ({
                 question: p.question,
                 answer: p.answer,
@@ -110,6 +112,7 @@ export function QuestBuilder() {
             title,
             description,
             musicUrl: musicUrl.trim() || undefined,
+            timerDuration,
             problems: problems.map((p, i) => ({
                 question: p.question,
                 answer: p.answer,
@@ -176,6 +179,23 @@ export function QuestBuilder() {
                             className="w-full bg-surface border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all placeholder:text-slate-600 focus:bg-surface/80"
                         />
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-400 uppercase tracking-wider ml-1">
+                        Timer Duration (seconds per question)
+                    </label>
+                    <input
+                        type="number"
+                        min="5"
+                        max="180"
+                        value={timerDuration}
+                        onChange={(e) => setTimerDuration(Math.min(180, Math.max(5, parseInt(e.target.value) || 30)))}
+                        className="w-full bg-surface border border-white/10 rounded-xl p-4 text-white text-lg font-bold focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all focus:bg-surface/80"
+                    />
+                    <p className="text-xs text-slate-500 ml-1">
+                        Students will have {timerDuration} seconds to answer each question (5-180 seconds)
+                    </p>
                 </div>
 
                 <div className="space-y-2">

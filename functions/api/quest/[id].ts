@@ -26,6 +26,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             ...quest,
             problems: JSON.parse(quest.problems as string),
             musicUrl: quest.music_url,
+            timerDuration: quest.timer_duration || 30,
             createdAt: quest.created_at,
             updatedAt: quest.updated_at
         };
