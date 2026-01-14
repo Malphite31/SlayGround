@@ -220,23 +220,25 @@ export const useGameStore = create<GameState>()(
 
             nextStage: async () => {
                 const state = get();
-                const nextStage = state.currentStage + 1;
+                const nextStageNum = state.currentStage + 1;
                 const pin = state.gamePin;
 
-                if (state.currentStage >= state.totalStages) {
-                    get().finishGame();
+                // If advancing would exceed total stages, finish the game
+                if (nextStageNum > state.totalStages) {
+                    await get().finishGame();
                     return;
                 }
 
+                // Otherwise, advance to next stage
                 if (pin) {
                     fetch('/api/game/update', {
                         method: 'POST',
-                        body: JSON.stringify({ action: 'next_stage', pin, stage: nextStage })
+                        body: JSON.stringify({ action: 'next_stage', pin, stage: nextStageNum })
                     }).catch(console.error);
                 }
 
                 set({
-                    currentStage: nextStage,
+                    currentStage: nextStageNum,
                     timeRemaining: state.timerDuration,
                     students: state.students.map(s => ({ ...s, hasAnswered: false })),
                 });
