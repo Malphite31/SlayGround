@@ -472,7 +472,18 @@ export const useGameStore = create<GameState>()(
                     }
 
                     const game = data.game;
-                    console.log('[CheckActive] Found active game:', game.pin, 'status:', game.status);
+                    const currentPin = get().gamePin;
+
+                    // If we already have this game, skip
+                    if (currentPin === game.pin) {
+                        console.log('[CheckActive] Already showing game:', game.pin);
+                        return;
+                    }
+
+                    console.log('[CheckActive] Found different active game:', game.pin, 'current:', currentPin, 'status:', game.status);
+
+                    // Stop current sync before switching games
+                    get().stopSync();
 
                     // Fetch the quest details
                     const questId = game.quest_id;
