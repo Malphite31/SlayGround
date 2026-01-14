@@ -448,45 +448,57 @@ export function HostView() {
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-center relative z-10 max-w-4xl w-full"
+                    className="text-center relative z-10 max-w-5xl w-full space-y-8"
                 >
-                    <h1 className="text-6xl md:text-8xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary mb-4">
-                        {currentQuest?.title || 'Loading Quest...'}
-                    </h1>
-                    <p className="text-2xl text-slate-400 mb-12 font-medium">
-                        Scan the QR code or visit the link to join!
-                    </p>
-
-                    <div className="glass-panel p-12 rounded-[3rem] border-white/10 shadow-2xl mb-8 inline-block bg-white">
-                        <QRCode value={joinUrl} size={300} level="H" />
-                    </div>
-
-                    <div className="glass-panel px-8 py-4 rounded-2xl border-primary/30 bg-primary/5 inline-block mb-8">
-                        <p className="text-4xl font-mono font-black text-white tracking-wider">
-                            PIN: {gamePin}
+                    {/* Title */}
+                    <div className="space-y-3">
+                        <h1 className="text-7xl md:text-9xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary leading-tight">
+                            {currentQuest?.title || 'Loading Quest...'}
+                        </h1>
+                        <p className="text-2xl md:text-3xl text-slate-400 font-medium">
+                            Scan the QR code or visit the link to join!
                         </p>
                     </div>
 
-                    <div className="flex items-center justify-center gap-4 mb-8">
-                        <Users className="w-8 h-8 text-primary" />
-                        <p className="text-3xl font-black text-white">
-                            {students.length} {students.length === 1 ? 'Student' : 'Students'} Joined
-                        </p>
+                    {/* QR Code and PIN - Side by side on larger screens */}
+                    <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 py-8">
+                        {/* QR Code */}
+                        <div className="glass-panel p-8 rounded-[3rem] border-white/10 shadow-2xl bg-white">
+                            <QRCode value={joinUrl} size={320} level="H" />
+                        </div>
+
+                        {/* PIN and Student Count */}
+                        <div className="flex flex-col gap-6 items-center lg:items-start">
+                            <div className="glass-panel px-10 py-6 rounded-2xl border-primary/30 bg-primary/5 shadow-lg">
+                                <p className="text-6xl font-mono font-black text-white tracking-wider">
+                                    {gamePin}
+                                </p>
+                            </div>
+
+                            <div className="flex items-center gap-4 bg-white/5 px-8 py-4 rounded-2xl border border-white/10">
+                                <Users className="w-10 h-10 text-primary" />
+                                <p className="text-4xl font-black text-white">
+                                    {students.length} {students.length === 1 ? 'Student' : 'Students'}
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
+                    {/* Student List */}
                     {students.length > 0 && (
-                        <div className="glass-panel p-6 rounded-2xl max-w-2xl mx-auto">
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div className="glass-panel p-8 rounded-2xl max-w-3xl mx-auto">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 {students.map((student) => (
-                                    <div key={student.id} className="bg-white/5 px-4 py-2 rounded-xl border border-white/10">
-                                        <p className="text-white font-bold truncate">{student.name}</p>
+                                    <div key={student.id} className="bg-white/5 px-4 py-3 rounded-xl border border-white/10">
+                                        <p className="text-white font-bold truncate text-lg">{student.name}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    <p className="text-slate-500 mt-8 text-lg">
+                    {/* Waiting Message */}
+                    <p className="text-slate-500 text-xl font-medium pt-4">
                         Waiting for teacher to start the game...
                     </p>
                 </motion.div>
