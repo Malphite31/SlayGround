@@ -125,7 +125,15 @@ export function HostView() {
     }, [status, showCountdown, showPerformance]);
 
     // Debug logging
-    console.log('[HostView] gamePin:', gamePin, 'status:', status, 'currentQuest:', currentQuest?.title);
+    console.log('[HostView] Render state:', {
+        gamePin,
+        status,
+        currentQuest: currentQuest?.title,
+        hasGamePin: !!gamePin,
+        isPlaying: status === 'playing',
+        isFinished: status === 'finished',
+        shouldShowWaiting: gamePin && status !== 'playing' && status !== 'finished'
+    });
 
     if (!gamePin) {
         return (
