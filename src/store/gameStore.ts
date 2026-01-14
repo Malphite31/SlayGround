@@ -91,20 +91,8 @@ export const useGameStore = create<GameState>()(
                 const quest = get().quests.find(q => q.id === questId);
                 if (!quest) return;
 
-                // FIRST: Stop any existing sync and completely clear old game state
+                // Stop any existing sync to prevent conflicts
                 get().stopSync();
-
-                // Clear ALL old game state immediately to prevent any persistence issues
-                set({
-                    gamePin: null,
-                    currentQuest: null,
-                    status: 'idle',
-                    isActive: false,
-                    currentStage: 0,
-                    totalStages: 0,
-                    students: [],
-                    timeRemaining: 30,
-                });
 
                 // Use quest's custom timer duration or default to 30 seconds
                 const duration = quest.timerDuration || timerDuration || 30;
