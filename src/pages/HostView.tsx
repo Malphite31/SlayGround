@@ -35,8 +35,14 @@ export function HostView() {
         setTimeRemaining,
         nextStage,
         status,
-        startSync // Added
+        startSync, // Added
+        validateGamePin // Added
     } = useGameStore();
+
+    // Validate persisted gamePin on mount
+    useEffect(() => {
+        validateGamePin();
+    }, [validateGamePin]);
 
     // Start polling sync if game is active
     useEffect(() => {

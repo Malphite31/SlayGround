@@ -23,8 +23,14 @@ export function AdminDashboard() {
         toggleQR, // Added
         startSync, // Added
         loadQuests, // Added
-        finishGame // Added
+        finishGame, // Added
+        validateGamePin // Added
     } = useGameStore();
+
+    // Validate persisted gamePin on mount
+    useEffect(() => {
+        validateGamePin();
+    }, [validateGamePin]);
 
     // Load quests from database on mount
     useEffect(() => {

@@ -70,6 +70,7 @@ interface GameState {
     startSync: () => void;
     stopSync: () => void;
     syncGameState: () => Promise<void>;
+    validateGamePin: () => Promise<boolean>;
 }
 
 export const useGameStore = create<GameState>()(
@@ -405,14 +406,50 @@ export const useGameStore = create<GameState>()(
 
             setTimeRemaining: (time) => set({ timeRemaining: time }),
             resetTimer: () => set((state) => ({ timeRemaining: state.timerDuration })),
+
+            validateGamePin: async () => {
+                const pin = get().gamePin;
+                if (!pin) {
+                    console.log('[Validate] No PIN to validate');
+                    return true; // No PIN is valid (idle state)
+                }
+
+                try {
+                    console.log('[Validate] Checking if PIN', pin, 'exists on server');
+                    const res = await fetch(`/api/game/${pin}`);
+
+                    if (!res.ok) {
+                        console.log('[Validate] PIN', pin, 'not found on server, clearing state');
+                        // Game doesn't exist on server, clear local state
+                        get().endGame();
+                        return false;
+                    }
+
+                    console.log('[Validate] PIN', pin, 'is valid');
+                    return true;
+                } catch (e) {
+                    console.error('[Validate] Error validating PIN:', e);
+                    // On network error, keep the state for now
+                    return true;
+                }
+            },
         }),
         {
             name: 'slayground-storage',
             partialize: (state) => {
                 const { status, syncInterval, ...rest } = state;
+
+                // Don't persist gamePin and currentQuest if game is finished or idle with no students
+                // This prevents stale game data from showing on reload
+                const shouldClearGame = state.status === 'finished' ||
+                    (state.status === 'idle' && state.students.length === 0);
+
                 return {
                     ...rest,
                     syncInterval: null, // Do not persist interval ID
+                    gamePin: shouldClearGame ? null : state.gamePin,
+                    currentQuest: shouldClearGame ? null : state.currentQuest,
+                    students: shouldClearGame ? [] : state.students,
                     // Do not persist status - always start fresh and sync from server
                 };
             },
