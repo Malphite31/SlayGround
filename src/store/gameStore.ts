@@ -46,7 +46,6 @@ interface GameState {
     quests: Quest[];
     timeRemaining: number;
     timerDuration: number;
-    isQRVisible: boolean;
     syncInterval: any;
 
     // Actions
@@ -54,7 +53,6 @@ interface GameState {
     startGame: () => void;
     pauseGame: () => void;
     finishGame: () => void; // Explicitly finish game
-    toggleQR: (visible: boolean) => void;
     joinGame: (pin: string, name: string) => Promise<{ success: boolean; error?: string; studentId?: string }>;
     markStudentAnswered: (studentId: string, isCorrect: boolean) => Promise<void>;
     updateStudentProgress: (studentId: string, stage: number, score: number) => void;
@@ -86,7 +84,6 @@ export const useGameStore = create<GameState>()(
             quests: [],
             timeRemaining: 30,
             timerDuration: 30,
-            isQRVisible: false,
             syncInterval: null,
 
             createGame: async (questId, timerDuration) => {
@@ -132,7 +129,6 @@ export const useGameStore = create<GameState>()(
                     students: [],
                     timerDuration: duration,
                     timeRemaining: duration,
-                    isQRVisible: true,
                 });
 
                 get().startSync();
@@ -172,7 +168,7 @@ export const useGameStore = create<GameState>()(
                         body: JSON.stringify({ action: 'start_game', pin })
                     }).catch(console.error);
                 }
-                set({ status: 'playing', isActive: true, isQRVisible: false });
+                set({ status: 'playing', isActive: true });
             },
             pauseGame: () => set({ status: 'paused', isActive: false }),
 
@@ -187,7 +183,6 @@ export const useGameStore = create<GameState>()(
                 set({ status: 'finished', isActive: false });
             },
 
-            toggleQR: (visible) => set({ isQRVisible: visible }),
 
             markStudentAnswered: async (studentId, isCorrect) => {
                 const stage = get().currentStage;

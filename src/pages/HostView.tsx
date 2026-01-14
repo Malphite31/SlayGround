@@ -26,7 +26,6 @@ function getYouTubeVideoId(url: string): string | null {
 export function HostView() {
     const {
         gamePin,
-        isQRVisible,
         students,
         currentQuest,
         currentStage,
@@ -648,40 +647,7 @@ export function HostView() {
                 </div>
             )}
 
-            {/* QR Overlay */}
-            <AnimatePresence>
-                {isQRVisible && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-3xl p-12">
-                        <div className="glass-panel p-20 rounded-[4rem] border-white/10 shadow-2xl max-w-6xl w-full flex items-center gap-20 relative">
-                            <div className="bg-white p-8 rounded-[3rem] shadow-2xl shrink-0">
-                                <QRCode value={`${window.location.origin}/play?pin=${gamePin}`} size={350} />
-                            </div>
-                            <div className="flex-1 space-y-12">
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-xl font-black text-primary">1</div>
-                                        <h2 className="text-3xl font-bold text-slate-400 uppercase tracking-widest">Connect Device</h2>
-                                    </div>
-                                    <div className="text-6xl font-heading font-black text-white break-all">{window.location.host}</div>
-                                </div>
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-xl font-black text-primary">2</div>
-                                        <h2 className="text-3xl font-bold text-slate-400 uppercase tracking-widest">Authorize Key</h2>
-                                    </div>
-                                    <div className="bg-surface border-4 border-white/10 px-12 py-6 rounded-[2.5rem] inline-block shadow-inner">
-                                        <span className="text-8xl font-mono font-black text-white tracking-[0.25em]">{gamePin}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-4 text-2xl font-black text-white bg-primary/10 border border-primary/20 p-6 rounded-3xl w-max">
-                                    <div className="w-4 h-4 bg-green-500 rounded-full animate-ping" />
-                                    Agents Linked: <span className="text-primary">{students.length}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
         </div>
     );
 }

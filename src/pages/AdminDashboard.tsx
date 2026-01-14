@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Play, Pause, SkipForward, Trash2, Edit, Users, Presentation, Copy, Scan } from 'lucide-react';
+import { Plus, Play, Pause, SkipForward, Trash2, Edit, Users, Presentation, Copy } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useGameStore } from '../store/gameStore';
 
@@ -19,8 +19,6 @@ export function AdminDashboard() {
         pauseGame,
         nextStage,
         deleteQuest,
-        isQRVisible, // Added
-        toggleQR, // Added
         startSync, // Added
         loadQuests, // Added
         finishGame, // Added
@@ -60,14 +58,6 @@ export function AdminDashboard() {
             deleteQuest(questId);
         }
     };
-
-
-
-    const handleToggleQR = () => {
-        toggleQR(!isQRVisible);
-    };
-
-
 
 
 
@@ -200,15 +190,6 @@ export function AdminDashboard() {
                     {gamePin && (
                         <div className="flex items-center gap-1.5 md:gap-2 w-full xl:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
                             <div className="h-6 md:h-8 w-px bg-white/10 mx-1 md:mx-2 hidden xl:block"></div>
-
-                            <Button
-                                variant={isQRVisible ? "primary" : "ghost"}
-                                onClick={handleToggleQR}
-                                className={`rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 ${isQRVisible ? 'bg-secondary hover:bg-secondary/90 text-white' : 'text-slate-400 hover:text-white hover:bg-white/5 bg-black/20'}`}
-                            >
-                                <Scan className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
-                                {isQRVisible ? 'Hide' : 'QR'}
-                            </Button>
 
                             <Button variant="ghost" onClick={handleCopyLink} className="rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 text-slate-400 hover:text-white hover:bg-white/5 bg-black/20">
                                 <Copy className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
