@@ -9,8 +9,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     try {
         // Get the most recent active game (idle or playing)
+        // ORDER BY ROWID DESC gets the most recently inserted row
         const result = await env.DB.prepare(
-            `SELECT * FROM games WHERE status IN ('idle', 'playing') ORDER BY id DESC LIMIT 1`
+            `SELECT * FROM games WHERE status IN ('idle', 'playing') ORDER BY ROWID DESC LIMIT 1`
         ).first();
 
         if (!result) {
