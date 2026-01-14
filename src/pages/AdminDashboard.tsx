@@ -19,16 +19,12 @@ export function AdminDashboard() {
         pauseGame,
         nextStage,
         deleteQuest,
-        startSync, // Added
-        loadQuests, // Added
-        finishGame, // Added
-        validateGamePin // Added
+        startSync,
+        loadQuests,
+        finishGame
     } = useGameStore();
 
-    // Validate persisted gamePin on mount
-    useEffect(() => {
-        validateGamePin();
-    }, [validateGamePin]);
+
 
     // Load quests from database on mount
     useEffect(() => {
