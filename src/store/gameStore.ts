@@ -457,9 +457,12 @@ export const useGameStore = create<GameState>()(
             partialize: (state) => {
                 const { status, syncInterval, ...rest } = state;
 
-                // Don't persist gamePin and currentQuest if game is finished or idle with no students
-                // This prevents stale game data from showing on reload
+                // Don't persist gamePin and currentQuest if:
+                // - Game is finished
+                // - Game is currently playing (to prevent stale active games)
+                // - Game is idle with no students
                 const shouldClearGame = state.status === 'finished' ||
+                    state.status === 'playing' ||
                     (state.status === 'idle' && state.students.length === 0);
 
                 return {
@@ -468,6 +471,7 @@ export const useGameStore = create<GameState>()(
                     gamePin: shouldClearGame ? null : state.gamePin,
                     currentQuest: shouldClearGame ? null : state.currentQuest,
                     students: shouldClearGame ? [] : state.students,
+                    currentStage: shouldClearGame ? 0 : state.currentStage,
                     // Do not persist status - always start fresh and sync from server
                 };
             },
