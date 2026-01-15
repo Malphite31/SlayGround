@@ -21,7 +21,9 @@ export function AdminDashboard() {
         deleteQuest,
         startSync,
         loadQuests,
-        finishGame
+        finishGame,
+        endGame,
+        status,
     } = useGameStore();
 
 
@@ -199,6 +201,18 @@ export function AdminDashboard() {
                                     <Button variant="ghost" onClick={finishGame} className="rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 bg-black/20 border-dashed border border-red-500/20">
                                         <span className="md:hidden">Finish</span>
                                         <span className="hidden md:inline">Finish Game</span>
+                                    </Button>
+                                </>
+                            )}
+
+                            {status === 'finished' && (
+                                <>
+                                    <div className="h-6 md:h-8 w-px bg-white/10 mx-1 md:mx-2 flex-shrink-0"></div>
+
+                                    <Button variant="ghost" onClick={endGame} className="rounded-lg md:rounded-xl h-9 md:h-10 text-xs md:text-sm px-3 md:px-4 flex-shrink-0 text-slate-400 hover:text-white hover:bg-white/10 bg-black/20">
+                                        <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
+                                        <span className="md:hidden">Close</span>
+                                        <span className="hidden md:inline">Close Session</span>
                                     </Button>
                                 </>
                             )}
@@ -396,7 +410,8 @@ export function AdminDashboard() {
                                         <li><strong>Start Game:</strong> Begins the first question timer. Questions appear on the projector and student devices simultaneously.</li>
                                         <li><strong>Next Stage:</strong> Manually advances to the next question if needed (usually automatic after timer).</li>
                                         <li><strong>Pause:</strong> Temporarily stops the timer and gameplay.</li>
-                                        <li><strong>Finish Game:</strong> Ends the session, clears all students, and displays the winner podium on the projector.</li>
+                                        <li><strong>Finish Game:</strong> Ends the gameplay and displays the winner podium on the projector. The results will remain visible.</li>
+                                        <li><strong>Close Session:</strong> Completely clears the game from the projector and returns to the System Idle state.</li>
                                         <li><strong>Manual Sync:</strong> Forces a refresh of student scores/data if real-time updates seem stuck.</li>
                                     </ul>
                                 </div>

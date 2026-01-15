@@ -513,11 +513,9 @@ export const useGameStore = create<GameState>()(
                 const { status, syncInterval, ...rest } = state;
 
                 // Don't persist gamePin and currentQuest if:
-                // - Game is finished
                 // - Game is idle with no students
-                // Note: DO persist playing games so they don't get cleared mid-game
-                const shouldClearGame = state.status === 'finished' ||
-                    (state.status === 'idle' && state.students.length === 0);
+                // Note: DO persist playing AND finished games so they don't get cleared
+                const shouldClearGame = (state.status === 'idle' && state.students.length === 0);
 
                 return {
                     ...rest,
@@ -527,6 +525,9 @@ export const useGameStore = create<GameState>()(
                     students: shouldClearGame ? [] : state.students,
                     currentStage: shouldClearGame ? 0 : state.currentStage,
                     // Do not persist status - always start fresh and sync from server
+                    // EXCEPT if it was finished, we might want to remember that to show results immediately?
+                    // Actually, let's persist status too so we know if we are in 'finished' state on reload
+                    status: state.status,
                 };
             },
         }
