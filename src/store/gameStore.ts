@@ -240,9 +240,9 @@ export const useGameStore = create<GameState>()(
                 const nextStageNum = state.currentStage + 1;
                 const pin = state.gamePin;
 
-                // If advancing would exceed total stages, finish the game
+                // Don't auto-advance past the last stage - teacher must manually finish
                 if (nextStageNum > state.totalStages) {
-                    await get().finishGame();
+                    console.log('[NextStage] Already at last stage, teacher must manually finish game');
                     return;
                 }
 

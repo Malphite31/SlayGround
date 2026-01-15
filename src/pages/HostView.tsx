@@ -97,14 +97,17 @@ export function HostView() {
         // Reveal answer
         setShowAnswer(true);
 
-        // After 5 seconds, advance to next stage
-        const timeout = setTimeout(() => {
-            setShowAnswer(false);
-            nextStage();
-        }, 5000);
-
-        return () => clearTimeout(timeout);
-    }, [status, currentProblem, timeRemaining]); // Removed showAnswer from dependencies
+        // Only auto-advance if NOT on the last stage
+        // On the last stage, teacher must manually finish the game
+        if (currentStage < totalStages) {
+            const timeout = setTimeout(() => {
+                setShowAnswer(false);
+                nextStage();
+            }, 5000);
+            return () => clearTimeout(timeout);
+        }
+        // If on last stage, just show answer and wait for teacher to finish
+    }, [status, currentProblem, timeRemaining, currentStage, totalStages, nextStage]);
 
     // Timer countdown interval
     useEffect(() => {
