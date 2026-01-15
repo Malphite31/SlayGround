@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS games (
   current_stage INTEGER DEFAULT 0,
   quest_id TEXT NOT NULL,
   total_stages INTEGER DEFAULT 0,
+  timer_duration INTEGER DEFAULT 30,  -- Timer duration in seconds (default 30)
   created_at INTEGER DEFAULT (strftime('%s', 'now'))
 );
 

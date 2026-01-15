@@ -8,7 +8,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (cursResponse) return cursResponse;
 
     try {
-        const { questId, totalStages, pin } = await request.json() as any;
+        const { questId, totalStages, pin, timerDuration } = await request.json() as any;
 
         if (!questId || !pin) {
             return errorResponse('Missing questId or pin');
@@ -30,10 +30,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             `DELETE FROM games WHERE pin = ?`
         ).bind(pin).run();
 
-        // Insert into D1
+        // Insert into D1 with timer_duration
         const { success } = await env.DB.prepare(
-            `INSERT INTO games (id, pin, status, current_stage, quest_id, total_stages) VALUES (?, ?, ?, ?, ?, ?)`
-        ).bind(gameId, pin, 'idle', 1, questId, totalStages || 0).run();
+            `INSERT INTO games (id, pin, status, current_stage, quest_id, total_stages, timer_duration) VALUES (?, ?, ?, ?, ?, ?, ?)`
+        ).bind(gameId, pin, 'idle', 1, questId, totalStages || 0, timerDuration || 30).run();
 
         if (!success) {
             return errorResponse('Failed to create game in database', 500);

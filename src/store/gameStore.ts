@@ -108,7 +108,8 @@ export const useGameStore = create<GameState>()(
                         body: JSON.stringify({
                             questId,
                             pin,
-                            totalStages: quest.problems.length
+                            totalStages: quest.problems.length,
+                            timerDuration: duration
                         })
                     });
 
@@ -187,12 +188,20 @@ export const useGameStore = create<GameState>()(
             finishGame: async () => {
                 const pin = get().gamePin;
                 if (pin) {
-                    fetch('/api/game/update', {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'finish_game', pin })
-                    }).catch(console.error);
+                    try {
+                        await fetch('/api/game/update', {
+                            method: 'POST',
+                            body: JSON.stringify({ action: 'finish_game', pin })
+                        });
+                        // Wait a moment for the server to commit the change
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    } catch (e) {
+                        console.error('[FinishGame] Error:', e);
+                    }
                 }
+                // Set finished status AFTER server confirms
                 set({ status: 'finished', isActive: false });
+                console.log('[FinishGame] Game finished, status set to finished');
             },
 
 
@@ -268,12 +277,13 @@ export const useGameStore = create<GameState>()(
                     const data = await res.json();
 
                     // Merge Server State
-                    const { status, current_stage, total_stages, quest_id } = data;
+                    const { status, current_stage, total_stages, quest_id, timer_duration } = data;
 
                     set(() => ({
                         status: status || 'idle',
                         currentStage: current_stage || 1,
                         totalStages: total_stages || 0,
+                        timerDuration: timer_duration || 30, // Apply timer duration from server
                         // Use server source of truth for students
                         students: data.students.map((s: any) => ({
                             id: s.id,
