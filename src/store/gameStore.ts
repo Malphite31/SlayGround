@@ -187,14 +187,19 @@ export const useGameStore = create<GameState>()(
 
             finishGame: async () => {
                 const pin = get().gamePin;
+
+                // STOP SYNC IMMEDIATELY to prevent race conditions
+                get().stopSync();
+                console.log('[FinishGame] Stopped sync to prevent race condition');
+
                 if (pin) {
                     try {
                         await fetch('/api/game/update', {
                             method: 'POST',
                             body: JSON.stringify({ action: 'finish_game', pin })
                         });
-                        // Wait a moment for the server to commit the change
-                        await new Promise(resolve => setTimeout(resolve, 300));
+                        // Wait for the server to fully commit the change
+                        await new Promise(resolve => setTimeout(resolve, 500));
                     } catch (e) {
                         console.error('[FinishGame] Error:', e);
                     }
@@ -280,8 +285,12 @@ export const useGameStore = create<GameState>()(
                     // Merge Server State
                     const { status, current_stage, total_stages, quest_id, timer_duration } = data;
 
+                    // IMPORTANT: Don't let sync override 'finished' status (prevents loop)
+                    const currentStatus = get().status;
+                    const newStatus = currentStatus === 'finished' ? 'finished' : (status || 'idle');
+
                     set(() => ({
-                        status: status || 'idle',
+                        status: newStatus,
                         currentStage: current_stage || 1,
                         totalStages: total_stages || 0,
                         timerDuration: timer_duration || 30, // Apply timer duration from server
