@@ -97,16 +97,21 @@ export function HostView() {
         // Reveal answer
         setShowAnswer(true);
 
-        // Only auto-advance if NOT on the last stage
-        // On the last stage, teacher must manually finish the game
-        if (currentStage < totalStages) {
-            const timeout = setTimeout(() => {
-                setShowAnswer(false);
+        // After 5 seconds, either advance to next stage or finish the game
+        const timeout = setTimeout(() => {
+            setShowAnswer(false);
+            // If on last stage, finish the game to show results
+            if (currentStage >= totalStages) {
+                console.log('[HostView] Last question completed, finishing game');
+                // Call finishGame from the store
+                useGameStore.getState().finishGame();
+            } else {
+                // Otherwise advance to next stage
                 nextStage();
-            }, 5000);
-            return () => clearTimeout(timeout);
-        }
-        // If on last stage, just show answer and wait for teacher to finish
+            }
+        }, 5000);
+
+        return () => clearTimeout(timeout);
     }, [status, currentProblem, timeRemaining, currentStage, totalStages, nextStage]);
 
     // Timer countdown interval
