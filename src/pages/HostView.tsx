@@ -92,8 +92,20 @@ export function HostView() {
 
     // Handle answer reveal and auto-advance when timer reaches 0
     useEffect(() => {
-        if (status !== 'playing' || !currentProblem || timeRemaining !== 0) return;
+        console.log('[HostView Timer Effect] Checking conditions:', {
+            status,
+            hasCurrentProblem: !!currentProblem,
+            currentProblemStage: currentProblem?.stage,
+            currentStage,
+            timeRemaining
+        });
 
+        if (status !== 'playing' || !currentProblem || timeRemaining !== 0) {
+            console.log('[HostView Timer Effect] Conditions not met, skipping');
+            return;
+        }
+
+        console.log('[HostView Timer Effect] Timer hit 0! Revealing answer');
         // Reveal answer
         setShowAnswer(true);
 
@@ -107,6 +119,7 @@ export function HostView() {
                 useGameStore.getState().finishGame();
             } else {
                 // Otherwise advance to next stage
+                console.log('[HostView] Advancing to next stage');
                 nextStage();
             }
         }, 5000);
