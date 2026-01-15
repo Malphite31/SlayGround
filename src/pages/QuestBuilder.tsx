@@ -207,7 +207,7 @@ export function QuestBuilder() {
                         type="url"
                         value={musicUrl}
                         onChange={(e) => setMusicUrl(e.target.value)}
-                        placeholder="https://www.youtube.com/watch?v=... (for final performance)"
+                        placeholder="https://youtube.com/shorts/... or https://tiktok.com/... (for final performance)"
                         className="w-full bg-surface border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all placeholder:text-slate-600 focus:bg-surface/80 font-mono text-sm"
                     />
                     {musicUrl && (

@@ -5,17 +5,58 @@ import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import confetti from 'canvas-confetti';
 
-// Helper function to extract YouTube video ID from URL
+// Helper functions to extract video information from various platforms
 function getYouTubeVideoId(url: string): string | null {
     try {
         const urlObj = new URL(url);
-        // Handle youtube.com/watch?v=VIDEO_ID
+        // Handle youtube.com URLs
         if (urlObj.hostname.includes('youtube.com')) {
+            // Check for shorts format: youtube.com/shorts/VIDEO_ID
+            if (urlObj.pathname.includes('/shorts/')) {
+                return urlObj.pathname.split('/shorts/')[1].split('/')[0].split('?')[0];
+            }
+            // Handle youtube.com/watch?v=VIDEO_ID
             return urlObj.searchParams.get('v');
         }
         // Handle youtu.be/VIDEO_ID
         if (urlObj.hostname.includes('youtu.be')) {
-            return urlObj.pathname.slice(1);
+            return urlObj.pathname.slice(1).split('?')[0];
+        }
+    } catch {
+        return null;
+    }
+    return null;
+}
+
+function getTikTokVideoId(url: string): string | null {
+    try {
+        const urlObj = new URL(url);
+        if (urlObj.hostname.includes('tiktok.com')) {
+            // Extract video ID from path like /video/1234567890 or /@username/video/1234567890
+            const match = urlObj.pathname.match(/\/video\/(\d+)/);
+            return match ? match[1] : null;
+        }
+        // vm.tiktok.com short links - return full URL as TikTok will handle redirect
+        if (urlObj.hostname.includes('vm.tiktok.com')) {
+            return url; // Return full URL for TikTok short links
+        }
+    } catch {
+        return null;
+    }
+    return null;
+}
+
+type VideoSource = 'youtube' | 'tiktok' | null;
+
+function getVideoSource(url: string): VideoSource {
+    if (!url) return null;
+    try {
+        const hostname = new URL(url).hostname;
+        if (hostname.includes('youtube.com') || hostname.includes('youtu.be')) {
+            return 'youtube';
+        }
+        if (hostname.includes('tiktok.com')) {
+            return 'tiktok';
         }
     } catch {
         return null;
@@ -448,8 +489,9 @@ export function HostView() {
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1 }}
-                        className="glass-panel p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border-primary/30 bg-primary/5 max-w-6xl w-full relative z-10 shadow-2xl backdrop-blur-md"
+                        className="glass-panel p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] border-primary/30 bg-primary/5 max-w-7xl w-full relative z-10 shadow-2xl backdrop-blur-md"
                     >
+                        {/* Header */}
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-4">
                                 <div className="bg-primary/20 p-3 rounded-2xl">
@@ -465,37 +507,63 @@ export function HostView() {
                             </div>
                         </div>
 
-                        {/* YouTube Player if music URL exists */}
-                        {currentQuest.musicUrl && getYouTubeVideoId(currentQuest.musicUrl) && (
-                            <div className="mb-6 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-2xl">
-                                <iframe
-                                    width="100%"
-                                    height="315"
-                                    src={`https://www.youtube.com/embed/${getYouTubeVideoId(currentQuest.musicUrl)}?autoplay=1&mute=0`}
-                                    title="Performance Music"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                    className="w-full"
-                                />
-                            </div>
-                        )}
+                        {/* Main Content Area - Video LEFT, Moves RIGHT */}
+                        <div className="flex flex-col lg:flex-row gap-6">
+                            {/* Video Player on the LEFT */}
+                            {currentQuest.musicUrl && (() => {
+                                const videoSource = getVideoSource(currentQuest.musicUrl);
+                                const youtubeId = videoSource === 'youtube' ? getYouTubeVideoId(currentQuest.musicUrl) : null;
+                                const tiktokId = videoSource === 'tiktok' ? getTikTokVideoId(currentQuest.musicUrl) : null;
 
-                        <div className="grid grid-cols-4 gap-4 md:gap-6">
-                            {currentQuest.problems.filter(p => p.move).map((p, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    transition={{ delay: 1.2 + (i * 0.15) }}
-                                    className="bg-white/5 p-4 md:p-5 rounded-2xl border border-white/10 text-center hover:bg-white/10 transition-colors group cursor-default"
-                                >
-                                    <div className="text-primary text-[10px] font-black tracking-widest uppercase mb-1 opacity-50 group-hover:opacity-100 transition-opacity">Step {i + 1}</div>
-                                    <div className="text-lg md:text-xl font-bold text-white group-hover:scale-105 transition-transform">{p.move}</div>
-                                </motion.div>
-                            ))}
+                                return (youtubeId || tiktokId) && (
+                                    <div className="flex-1 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-2xl bg-black/20">
+                                        {videoSource === 'youtube' && youtubeId && (
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                style={{ minHeight: '500px' }}
+                                                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=0`}
+                                                title="Performance Music"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                                className="w-full h-full"
+                                            />
+                                        )}
+                                        {videoSource === 'tiktok' && tiktokId && (
+                                            <div className="flex items-center justify-center" style={{ minHeight: '500px' }}>
+                                                <blockquote
+                                                    className="tiktok-embed"
+                                                    cite={typeof tiktokId === 'string' && tiktokId.startsWith('http') ? tiktokId : `https://www.tiktok.com/video/${tiktokId}`}
+                                                    data-video-id={typeof tiktokId === 'string' && !tiktokId.startsWith('http') ? tiktokId : undefined}
+                                                    style={{ maxWidth: '605px', minWidth: '325px' }}
+                                                >
+                                                    <section></section>
+                                                </blockquote>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Dance Moves on the RIGHT */}
+                            <div className="flex-1 grid grid-cols-2 gap-4 md:gap-6 content-start">
+                                {currentQuest.problems.filter(p => p.move).map((p, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ scale: 0.8, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        transition={{ delay: 1.2 + (i * 0.15) }}
+                                        className="bg-white/5 p-4 md:p-5 rounded-2xl border border-white/10 text-center hover:bg-white/10 transition-colors group cursor-default"
+                                    >
+                                        <div className="text-primary text-[10px] font-black tracking-widest uppercase mb-1 opacity-50 group-hover:opacity-100 transition-opacity">Step {i + 1}</div>
+                                        <div className="text-lg md:text-xl font-bold text-white group-hover:scale-105 transition-transform">{p.move}</div>
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
 
+                        {/* Bottom Message */}
                         <div className="mt-6 flex items-center justify-center gap-4 text-xl text-slate-300 font-medium">
                             <Sparkles className="w-6 h-6 text-yellow-400" />
                             <span>Perform the routine together in front of the class!</span>
