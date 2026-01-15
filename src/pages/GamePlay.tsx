@@ -95,22 +95,21 @@ export function GamePlay() {
         }, 3000);
     };
 
-    // Winner / Game Over View
-    if (status === 'finished') {
-        const sortedStudents = [...students].sort((a, b) => b.score - a.score);
-        const myRank = sortedStudents.findIndex(s => s.id === studentId) + 1;
-        const isWinner = myRank === 1;
+    // Winner fireworks effect - moved outside conditional to fix hooks violation
+    useEffect(() => {
+        if (status === 'finished') {
+            const sortedStudents = [...students].sort((a, b) => b.score - a.score);
+            const myRank = sortedStudents.findIndex(s => s.id === studentId) + 1;
+            const isWinner = myRank === 1;
 
-        // Fire realistic fireworks loop for winner
-        useEffect(() => {
             if (isWinner) {
-                const duration = 5000; // Shorter burst for student device
+                const duration = 5000;
                 const animationEnd = Date.now() + duration;
                 const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
                 const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
-                const interval: any = setInterval(function () {
+                const interval = setInterval(() => {
                     const timeLeft = animationEnd - Date.now();
 
                     if (timeLeft <= 0) {
@@ -124,7 +123,14 @@ export function GamePlay() {
 
                 return () => clearInterval(interval);
             }
-        }, [isWinner]);
+        }
+    }, [status, students, studentId]);
+
+    // Winner / Game Over View
+    if (status === 'finished') {
+        const sortedStudents = [...students].sort((a, b) => b.score - a.score);
+        const myRank = sortedStudents.findIndex(s => s.id === studentId) + 1;
+        const isWinner = myRank === 1;
 
         return (
             <div className="flex flex-col items-center justify-center min-h-[100dvh] text-center px-6 bg-[#030712] relative overflow-hidden">
