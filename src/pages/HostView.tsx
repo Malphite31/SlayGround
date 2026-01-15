@@ -62,22 +62,27 @@ export function HostView() {
         validateGamePin();
     }, [validateGamePin]);
 
-    // Start polling sync if game is active
+    // Start polling sync if game is active (but NOT if finished)
     useEffect(() => {
-        if (gamePin) {
-            console.log('[HostView] Game PIN detected, starting sync:', gamePin);
+        if (gamePin && status !== 'finished') {
+            console.log('[HostView] Game PIN detected, starting sync:', gamePin, 'status:', status);
             startSync();
+        } else if (status === 'finished') {
+            console.log('[HostView] Game finished, NOT starting sync');
         }
-    }, [gamePin, startSync]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [gamePin, status]); // Removed startSync from deps to prevent infinite loop
 
     // Also try to sync on mount in case gamePin is already set
     useEffect(() => {
         const pin = useGameStore.getState().gamePin;
-        if (pin) {
+        const currentStatus = useGameStore.getState().status;
+        if (pin && currentStatus !== 'finished') {
             console.log('[HostView] Mounted with existing PIN, starting sync:', pin);
             startSync();
         }
-    }, [startSync]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Run only once on mount
 
     const currentProblem = currentQuest?.problems.find(p => p.stage === currentStage);
     const answeredCount = students.filter(s => s.hasAnswered).length;
