@@ -126,6 +126,105 @@ export function GamePlay() {
         }
     }, [status, students, studentId]);
 
+    // Waiting Screen - Student joined but teacher hasn't started the game
+    if (status === 'idle') {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[100dvh] text-center px-4 sm:px-6 bg-[#030712] relative overflow-hidden">
+                {/* Animated Background */}
+                <div className="absolute inset-0 bg-mesh opacity-20" />
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-secondary/10" />
+
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="glass-panel p-6 sm:p-8 md:p-12 rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] max-w-md w-full relative z-10 border-white/10 shadow-2xl backdrop-blur-3xl"
+                >
+                    {/* Pulsing Icon */}
+                    <motion.div
+                        animate={{
+                            scale: [1, 1.1, 1],
+                            rotate: [0, 5, -5, 0]
+                        }}
+                        transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                        className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-6 sm:mb-8 border-2 border-white/10 shadow-lg"
+                    >
+                        <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
+                    </motion.div>
+
+                    {/* Welcome Message */}
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-black mb-3 sm:mb-4 text-white">
+                        You're In!
+                    </h1>
+                    <p className="text-sm sm:text-base md:text-lg text-slate-400 mb-6 sm:mb-8 font-medium">
+                        Waiting for your teacher to start the mission...
+                    </p>
+
+                    {/* Student Count */}
+                    <div className="bg-white/5 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-white/10 mb-6 sm:mb-8">
+                        <div className="text-xs sm:text-sm text-slate-500 uppercase tracking-widest font-black mb-2">Players Ready</div>
+                        <div className="flex items-center justify-center gap-2 sm:gap-3">
+                            <motion.div
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                                className="text-3xl sm:text-4xl md:text-5xl font-black text-primary"
+                            >
+                                {students.length}
+                            </motion.div>
+                            <div className="flex flex-col items-start">
+                                <span className="text-xl sm:text-2xl font-bold text-white">/ {students.length}</span>
+                                <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">Online</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Animated Dots */}
+                    <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+                        {[0, 1, 2].map((i) => (
+                            <motion.div
+                                key={i}
+                                animate={{
+                                    y: [0, -10, 0],
+                                    opacity: [0.3, 1, 0.3]
+                                }}
+                                transition={{
+                                    duration: 1.5,
+                                    repeat: Infinity,
+                                    delay: i * 0.2,
+                                    ease: "easeInOut"
+                                }}
+                                className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-primary"
+                            />
+                        ))}
+                    </div>
+
+                    {/* Quest Info */}
+                    {currentQuest && (
+                        <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-primary/20">
+                            <div className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-widest font-black mb-1 sm:mb-2">Mission</div>
+                            <div className="text-sm sm:text-base md:text-lg font-bold text-white">{currentQuest.title}</div>
+                            <div className="text-xs sm:text-sm text-slate-400 mt-1 sm:mt-2">
+                                {currentQuest.problems.length} questions · {currentQuest.timerDuration || 30}s each
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Fun Message */}
+                    <motion.p
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="text-xs sm:text-sm text-slate-500 mt-6 sm:mt-8 font-bold"
+                    >
+                        🎮 Get ready to slay!
+                    </motion.p>
+                </motion.div>
+            </div>
+        );
+    }
+
     // Winner / Game Over View
     if (status === 'finished') {
         const sortedStudents = [...students].sort((a, b) => b.score - a.score);
