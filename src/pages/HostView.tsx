@@ -232,7 +232,19 @@ export function HostView() {
         return () => clearInterval(interval);
     }, [status]);
 
+    // Debug render decision
+    console.log('[HostView] Render decision:', {
+        hasGamePin: !!gamePin,
+        gamePin,
+        status,
+        isFinished: status === 'finished',
+        studentsCount: students.length,
+        willShowIdle: !gamePin,
+        willShowWinner: status === 'finished'
+    });
+
     if (!gamePin) {
+        console.log('[HostView] Rendering IDLE screen (no gamePin)');
         return (
             <div className="flex flex-col items-center justify-center h-screen text-center px-4 relative overflow-hidden">
                 <div className="bg-mesh opacity-50 absolute inset-0"></div>
@@ -256,6 +268,7 @@ export function HostView() {
 
     // Winner View
     if (status === 'finished') {
+        console.log('[HostView] Rendering WINNER view');
         const sortedStudents = [...students].sort((a, b) => b.score - a.score);
         const top3 = sortedStudents.slice(0, 3);
         // Add safe check for empty students array
