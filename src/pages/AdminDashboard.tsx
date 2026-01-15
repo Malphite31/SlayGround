@@ -77,6 +77,18 @@ export function AdminDashboard() {
     const [authError, setAuthError] = useState('');
     const [isManualOpen, setIsManualOpen] = useState(false);
 
+    // Auto-display user manual on first login
+    useEffect(() => {
+        if (isAuthenticated && !localStorage.getItem('admin_manual_seen')) {
+            setIsManualOpen(true);
+        }
+    }, [isAuthenticated]);
+
+    const handleCloseManual = () => {
+        setIsManualOpen(false);
+        localStorage.setItem('admin_manual_seen', 'true');
+    };
+
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         // Strict Admin Key validation
@@ -360,83 +372,202 @@ export function AdminDashboard() {
             )}
             {/* User Manual Modal */}
             {isManualOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setIsManualOpen(false)}>
-                    <div className="glass-panel w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 rounded-3xl border-white/20 shadow-2xl relative" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setIsManualOpen(false)} className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={handleCloseManual}>
+                    <div className="glass-panel w-full max-w-5xl max-h-[90vh] overflow-y-auto p-8 rounded-3xl border-white/20 shadow-2xl relative" onClick={e => e.stopPropagation()}>
+                        <button onClick={handleCloseManual} className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
                             <Plus className="w-6 h-6 rotate-45" />
                         </button>
 
-                        <h2 className="text-4xl font-heading font-black text-white mb-8">User Manual</h2>
+                        <div className="mb-8">
+                            <h2 className="text-4xl font-heading font-black text-white mb-2">Command Center User Guide</h2>
+                            <p className="text-slate-400">Everything you need to know to run SlayGround like a pro</p>
+                        </div>
 
                         <div className="space-y-10 text-slate-300">
+                            <section className="glass-panel p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
+                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                    <span className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-lg">📋</span>
+                                    What is the Command Center?
+                                </h3>
+                                <div className="pl-13 space-y-3">
+                                    <p>The <strong>Command Center</strong> is your mission control for SlayGround sessions. From here, you can:</p>
+                                    <ul className="list-disc pl-5 space-y-2">
+                                        <li>Create and manage educational quests with custom questions</li>
+                                        <li>Launch game sessions and monitor student participation in real-time</li>
+                                        <li>Control game flow with start, pause, and navigation controls</li>
+                                        <li>Display the projector view for classroom engagement</li>
+                                        <li>Track student progress, scores, and unlocked dance moves</li>
+                                    </ul>
+                                </div>
+                            </section>
+
                             <section>
                                 <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-sm">1</span>
+                                    <span className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-lg">🚀</span>
                                     Getting Started
                                 </h3>
-                                <div className="pl-11 space-y-2">
-                                    <p>Welcome to SlayGround! To begin a session:</p>
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        <li>Create a new quest by clicking <strong>New Quest</strong> or select an existing one from the library.</li>
-                                        <li>Click the <Play className="w-4 h-4 inline text-primary" /> <strong>Play</strong> icon on a quest to initialize the game environment.</li>
-                                        <li>This will generate a unique 4-digit <strong>Game PIN</strong>.</li>
-                                    </ul>
+                                <div className="pl-13 space-y-3">
+                                    <p className="text-lg font-semibold text-white">Quick Start in 3 Steps:</p>
+                                    <ol className="list-decimal pl-5 space-y-3">
+                                        <li>
+                                            <strong className="text-white">Choose or Create a Quest</strong>
+                                            <ul className="list-disc pl-5 mt-1 space-y-1 text-sm">
+                                                <li>Click <span className="px-2 py-1 bg-primary/20 text-primary rounded font-mono text-xs">+ Create Quest</span> to build a new quest, or</li>
+                                                <li>Select an existing quest from the Quest Library panel</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <strong className="text-white">Initialize the Game</strong>
+                                            <ul className="list-disc pl-5 mt-1 space-y-1 text-sm">
+                                                <li>Click the <Play className="w-3 h-3 inline text-primary" /> <strong>Play</strong> icon next to your chosen quest</li>
+                                                <li>A unique 4-digit <strong>Game PIN</strong> will be generated automatically</li>
+                                                <li>The game status changes to "waiting for students"</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <strong className="text-white">Launch the Projector</strong>
+                                            <ul className="list-disc pl-5 mt-1 space-y-1 text-sm">
+                                                <li>Click <span className="px-2 py-1 bg-accent/20 text-accent rounded font-mono text-xs">Launch Projector</span> to open the Host View</li>
+                                                <li>Drag the new tab to your projector/second screen</li>
+                                                <li>Students can now scan the QR code or enter the PIN at <code className="bg-black/30 px-2 py-0.5 rounded">{window.location.host}/play</code></li>
+                                            </ul>
+                                        </li>
+                                    </ol>
                                 </div>
                             </section>
 
                             <section>
                                 <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-sm">2</span>
-                                    Hosting & Projector
+                                    <span className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-lg">✏️</span>
+                                    Quest Builder Guide
                                 </h3>
-                                <div className="pl-11 space-y-2">
-                                    <p>Once a game is initialized:</p>
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        <li>Click <strong>Launch Projector</strong> to open the Host View in a new tab. Drag this to the projector screen.</li>
-                                        <li>On the Host View, students can scan the <strong>QR Code</strong> to join instantly.</li>
-                                        <li>Alternatively, they can visit <code>{window.location.host}/play</code> and enter the Game PIN manually.</li>
-                                    </ul>
+                                <div className="pl-13 space-y-3">
+                                    <p>Create engaging educational content with these question types:</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                                        <div className="bg-white/5 p-4 rounded-xl">
+                                            <h4 className="font-bold text-white mb-2">📝 Multiple Choice</h4>
+                                            <p className="text-sm">Students select from 2-4 answer options</p>
+                                        </div>
+                                        <div className="bg-white/5 p-4 rounded-xl">
+                                            <h4 className="font-bold text-white mb-2">✓ True/False</h4>
+                                            <p className="text-sm">Simple binary choice questions</p>
+                                        </div>
+                                        <div className="bg-white/5 p-4 rounded-xl">
+                                            <h4 className="font-bold text-white mb-2">⌨️ Fill in the Blank</h4>
+                                            <p className="text-sm">Students type the missing word(s)</p>
+                                        </div>
+                                        <div className="bg-white/5 p-4 rounded-xl">
+                                            <h4 className="font-bold text-white mb-2">💬 Short Answer</h4>
+                                            <p className="text-sm">Free-form text responses</p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+                                        <p className="text-sm"><strong className="text-blue-400">💡 Pro Tip:</strong> Set custom timer durations (default: 30s) and add YouTube music links for the final performance!</p>
+                                    </div>
                                 </div>
                             </section>
 
                             <section>
                                 <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-sm">3</span>
-                                    Managing the Game
+                                    <span className="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center text-lg">🎮</span>
+                                    Game Controls
                                 </h3>
-                                <div className="pl-11 space-y-2">
-                                    <p>Control the flow from this Command Center:</p>
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        <li><strong>Start Game:</strong> Begins the first question timer. Questions appear on the projector and student devices simultaneously.</li>
-                                        <li><strong>Next Stage:</strong> Manually advances to the next question if needed (usually automatic after timer).</li>
-                                        <li><strong>Pause:</strong> Temporarily stops the timer and gameplay.</li>
-                                        <li><strong>Finish Game:</strong> Ends the gameplay and displays the winner podium on the projector. The results will remain visible.</li>
-                                        <li><strong>Close Session:</strong> Completely clears the game from the projector and returns to the System Idle state.</li>
-                                        <li><strong>Manual Sync:</strong> Forces a refresh of student scores/data if real-time updates seem stuck.</li>
+                                <div className="pl-13 space-y-3">
+                                    <p>Manage your game session with these controls:</p>
+                                    <div className="space-y-3 mt-3">
+                                        <div className="flex items-start gap-3">
+                                            <span className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg font-bold text-sm whitespace-nowrap">START</span>
+                                            <p className="text-sm">Begins the game timer and enables student answering. The first question appears on all screens.</p>
+                                        </div>
+                                        <div className="flex items-start gap-3">
+                                            <span className="px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded-lg font-bold text-sm whitespace-nowrap">PAUSE</span>
+                                            <p className="text-sm">Temporarily freezes the timer and prevents answers. Use for classroom discussions or technical issues.</p>
+                                        </div>
+                                        <div className="flex items-start gap-3">
+                                            <span className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg font-bold text-sm whitespace-nowrap">NEXT</span>
+                                            <p className="text-sm">Manually advance to the next question. Normally automatic when timer expires, but useful for skipping.</p>
+                                        </div>
+                                        <div className="flex items-start gap-3">
+                                            <span className="px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg font-bold text-sm whitespace-nowrap">FINISH</span>
+                                            <p className="text-sm">Ends the game and shows the winner podium. Results stay visible until you close the session.</p>
+                                        </div>
+                                        <div className="flex items-start gap-3">
+                                            <span className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg font-bold text-sm whitespace-nowrap">CLOSE</span>
+                                            <p className="text-sm">Completely ends the session, clears all data, and returns to idle state. Students are disconnected.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                    <span className="w-10 h-10 rounded-xl bg-pink-600 flex items-center justify-center text-lg">💃</span>
+                                    Dance Moves & Performance
+                                </h3>
+                                <div className="pl-13 space-y-3">
+                                    <p>SlayGround gamifies learning with dance move rewards:</p>
+                                    <ul className="list-disc pl-5 space-y-2">
+                                        <li><strong>Unlock Moves:</strong> When students answer correctly, they unlock dance moves assigned to that question</li>
+                                        <li><strong>Real-Time Display:</strong> The projector shows which student unlocked which move in real-time</li>
+                                        <li><strong>Final Performance:</strong> After the game ends, all unlocked moves are showcased with music from the YouTube link you set</li>
+                                        <li><strong>Song Parts:</strong> Each question can unlock a specific part of the choreography, building the full performance progressively</li>
                                     </ul>
                                 </div>
                             </section>
 
                             <section>
                                 <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-sm">4</span>
+                                    <span className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center text-lg">🎓</span>
                                     Student Experience
                                 </h3>
-                                <div className="pl-11 space-y-2">
-                                    <p>What the students see:</p>
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        <li>Students enter their name to join the lobby.</li>
-                                        <li>When the game starts, questions appear on their device.</li>
-                                        <li>Correct answers earn points. Speed matters!</li>
-                                        <li>After the game, the top 3 students are displayed on the podium.</li>
-                                    </ul>
+                                <div className="pl-13 space-y-3">
+                                    <p>Understanding what students see helps you guide them:</p>
+                                    <ol className="list-decimal pl-5 space-y-2">
+                                        <li>Students visit <code className="bg-black/30 px-2 py-0.5 rounded">{window.location.host}/play</code> or scan the QR code</li>
+                                        <li>They enter their name to join the lobby</li>
+                                        <li>When you start the game, questions appear on their device</li>
+                                        <li>They select/type answers before time runs out</li>
+                                        <li>Correct answers earn points (speed bonus applies!)</li>
+                                        <li>After all questions, the top 3 students appear on the winner podium</li>
+                                        <li>The final dance performance showcases all unlocked moves</li>
+                                    </ol>
+                                </div>
+                            </section>
+
+                            <section className="glass-panel p-6 rounded-2xl bg-gradient-to-br from-red-500/5 to-transparent border-red-500/20">
+                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                    <span className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-lg">⚠️</span>
+                                    Troubleshooting
+                                </h3>
+                                <div className="pl-13 space-y-4">
+                                    <div>
+                                        <h4 className="font-bold text-white mb-2">❓ Students not appearing in real-time?</h4>
+                                        <p className="text-sm">The system polls every 2 seconds. Wait a moment, or refresh the page. Check that students entered the correct PIN.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white mb-2">❓ Projector shows blank screen?</h4>
+                                        <p className="text-sm">Ensure you've initialized a game first. The projector needs an active game PIN to display content. Try refreshing the Host View tab.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white mb-2">❓ Game won't start?</h4>
+                                        <p className="text-sm">Make sure at least one student has joined. Check that you clicked the Play icon on a quest to generate a PIN.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white mb-2">❓ Timer stuck or wrong duration?</h4>
+                                        <p className="text-sm">The timer duration is set per-quest in the Quest Builder. Default is 30 seconds. Edit the quest to change it.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white mb-2">❓ Need to reset everything?</h4>
+                                        <p className="text-sm">Click <strong>Close Session</strong> to completely clear the current game. You can then start fresh with a new quest.</p>
+                                    </div>
                                 </div>
                             </section>
                         </div>
 
-                        <div className="mt-12 pt-8 border-t border-white/10 flex justify-end">
-                            <Button variant="primary" onClick={() => setIsManualOpen(false)}>
-                                Close Manual
+                        <div className="mt-12 pt-8 border-t border-white/10 flex justify-between items-center">
+                            <p className="text-slate-400 text-sm">💡 <strong>Tip:</strong> You can reopen this guide anytime from the User Manual button</p>
+                            <Button variant="primary" onClick={handleCloseManual}>
+                                Got it, Let's Go!
                             </Button>
                         </div>
                     </div>
