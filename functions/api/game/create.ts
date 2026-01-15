@@ -16,6 +16,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         const gameId = crypto.randomUUID();
 
+        // Ensure single active game: Finish all other running games
+        await env.DB.prepare(
+            `UPDATE games SET status = 'finished' WHERE status IN ('idle', 'playing')`
+        ).run();
+
         // Ensure fresh start: Delete any existing game with this PIN
         await env.DB.prepare(
             `DELETE FROM students WHERE game_id IN (SELECT id FROM games WHERE pin = ?)`

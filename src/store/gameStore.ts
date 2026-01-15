@@ -510,25 +510,8 @@ export const useGameStore = create<GameState>()(
         {
             name: 'slayground-storage',
             partialize: (state) => {
-                const { status, syncInterval, ...rest } = state;
-
-                // Don't persist gamePin and currentQuest if:
-                // - Game is idle with no students
-                // Note: DO persist playing AND finished games so they don't get cleared
-                const shouldClearGame = (state.status === 'idle' && state.students.length === 0);
-
-                return {
-                    ...rest,
-                    syncInterval: null, // Do not persist interval ID
-                    gamePin: shouldClearGame ? null : state.gamePin,
-                    currentQuest: shouldClearGame ? null : state.currentQuest,
-                    students: shouldClearGame ? [] : state.students,
-                    currentStage: shouldClearGame ? 0 : state.currentStage,
-                    // Do not persist status - always start fresh and sync from server
-                    // EXCEPT if it was finished, we might want to remember that to show results immediately?
-                    // Actually, let's persist status too so we know if we are in 'finished' state on reload
-                    status: state.status,
-                };
+                const { syncInterval, ...rest } = state;
+                return { ...rest };
             },
         }
     )
