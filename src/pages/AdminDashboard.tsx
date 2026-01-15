@@ -372,24 +372,24 @@ export function AdminDashboard() {
             )}
             {/* User Manual Modal */}
             {isManualOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={handleCloseManual}>
-                    <div className="glass-panel w-full max-w-5xl max-h-[90vh] overflow-y-auto p-8 rounded-3xl border-white/20 shadow-2xl relative" onClick={e => e.stopPropagation()}>
-                        <button onClick={handleCloseManual} className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
-                            <Plus className="w-6 h-6 rotate-45" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm" onClick={handleCloseManual}>
+                    <div className="glass-panel w-full max-w-5xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border-white/20 shadow-2xl relative" onClick={e => e.stopPropagation()}>
+                        <button onClick={handleCloseManual} className="absolute top-3 right-3 sm:top-6 sm:right-6 p-1.5 sm:p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
+                            <Plus className="w-5 h-5 sm:w-6 sm:h-6 rotate-45" />
                         </button>
 
-                        <div className="mb-8">
+                        <div className="mb-6 sm:mb-8">
                             <h2 className="text-4xl font-heading font-black text-white mb-2">Command Center User Guide</h2>
                             <p className="text-slate-400">Everything you need to know to run SlayGround like a pro</p>
                         </div>
 
-                        <div className="space-y-10 text-slate-300">
-                            <section className="glass-panel p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
-                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-lg">📋</span>
+                        <div className="space-y-6 sm:space-y-8 md:space-y-10 text-slate-300 text-sm sm:text-base">
+                            <section className="glass-panel p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+                                    <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-primary flex items-center justify-center text-base sm:text-lg flex-shrink-0">📋</span>
                                     What is the Command Center?
                                 </h3>
-                                <div className="pl-13 space-y-3">
+                                <div className="pl-0 sm:pl-11 md:pl-13 space-y-2 sm:space-y-3">
                                     <p>The <strong>Command Center</strong> is your mission control for SlayGround sessions. From here, you can:</p>
                                     <ul className="list-disc pl-5 space-y-2">
                                         <li>Create and manage educational quests with custom questions</li>
@@ -402,12 +402,12 @@ export function AdminDashboard() {
                             </section>
 
                             <section>
-                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-lg">🚀</span>
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+                                    <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-secondary flex items-center justify-center text-base sm:text-lg flex-shrink-0">🚀</span>
                                     Getting Started
                                 </h3>
-                                <div className="pl-13 space-y-3">
-                                    <p className="text-lg font-semibold text-white">Quick Start in 3 Steps:</p>
+                                <div className="pl-0 sm:pl-11 md:pl-13 space-y-2 sm:space-y-3">
+                                    <p className="text-base sm:text-lg font-semibold text-white">Quick Start in 3 Steps:</p>
                                     <ol className="list-decimal pl-5 space-y-3">
                                         <li>
                                             <strong className="text-white">Choose or Create a Quest</strong>
@@ -437,18 +437,18 @@ export function AdminDashboard() {
                             </section>
 
                             <section>
-                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-lg">✏️</span>
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+                                    <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-accent flex items-center justify-center text-base sm:text-lg flex-shrink-0">✏️</span>
                                     Quest Builder Guide
                                 </h3>
-                                <div className="pl-13 space-y-3">
+                                <div className="pl-0 sm:pl-11 md:pl-13 space-y-2 sm:space-y-3">
                                     <p>Create engaging educational content with these question types:</p>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mt-2 sm:mt-3">
                                         <div className="bg-white/5 p-4 rounded-xl">
                                             <h4 className="font-bold text-white mb-2">📝 Multiple Choice</h4>
-                                            <p className="text-sm">Students select from 2-4 answer options</p>
+                                            <p className="text-xs sm:text-sm">Students select from 2-4 answer options</p>
                                         </div>
-                                        <div className="bg-white/5 p-4 rounded-xl">
+                                        <div className="bg-white/5 p-3 sm:p-4 rounded-lg sm:rounded-xl">
                                             <h4 className="font-bold text-white mb-2">✓ True/False</h4>
                                             <p className="text-sm">Simple binary choice questions</p>
                                         </div>
@@ -456,55 +456,55 @@ export function AdminDashboard() {
                                             <h4 className="font-bold text-white mb-2">⌨️ Fill in the Blank</h4>
                                             <p className="text-sm">Students type the missing word(s)</p>
                                         </div>
-                                        <div className="bg-white/5 p-4 rounded-xl">
-                                            <h4 className="font-bold text-white mb-2">💬 Short Answer</h4>
-                                            <p className="text-sm">Free-form text responses</p>
+                                        <div className="bg-white/5 p-3 sm:p-4 rounded-lg sm:rounded-xl">
+                                            <h4 className="font-bold text-white mb-1 sm:mb-2 text-sm sm:text-base">💬 Short Answer</h4>
+                                            <p className="text-xs sm:text-sm">Free-form text responses</p>
                                         </div>
                                     </div>
-                                    <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+                                    <div className="mt-3 sm:mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg sm:rounded-xl p-3 sm:p-4">
                                         <p className="text-sm"><strong className="text-blue-400">💡 Pro Tip:</strong> Set custom timer durations (default: 30s) and add YouTube music links for the final performance!</p>
                                     </div>
                                 </div>
                             </section>
 
                             <section>
-                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center text-lg">🎮</span>
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+                                    <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-green-600 flex items-center justify-center text-base sm:text-lg flex-shrink-0">🎮</span>
                                     Game Controls
                                 </h3>
-                                <div className="pl-13 space-y-3">
+                                <div className="pl-0 sm:pl-11 md:pl-13 space-y-2 sm:space-y-3">
                                     <p>Manage your game session with these controls:</p>
-                                    <div className="space-y-3 mt-3">
+                                    <div className="space-y-2 sm:space-y-3 mt-2 sm:mt-3">
                                         <div className="flex items-start gap-3">
                                             <span className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg font-bold text-sm whitespace-nowrap">START</span>
                                             <p className="text-sm">Begins the game timer and enables student answering. The first question appears on all screens.</p>
                                         </div>
-                                        <div className="flex items-start gap-3">
-                                            <span className="px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded-lg font-bold text-sm whitespace-nowrap">PAUSE</span>
-                                            <p className="text-sm">Temporarily freezes the timer and prevents answers. Use for classroom discussions or technical issues.</p>
+                                        <div className="flex items-start gap-2 sm:gap-3">
+                                            <span className="px-2 py-1 sm:px-3 sm:py-1.5 bg-yellow-500/20 text-yellow-400 rounded-md sm:rounded-lg font-bold text-xs sm:text-sm whitespace-nowrap flex-shrink-0">PAUSE</span>
+                                            <p className="text-xs sm:text-sm">Temporarily freezes the timer and prevents answers. Use for classroom discussions or technical issues.</p>
                                         </div>
-                                        <div className="flex items-start gap-3">
-                                            <span className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg font-bold text-sm whitespace-nowrap">NEXT</span>
-                                            <p className="text-sm">Manually advance to the next question. Normally automatic when timer expires, but useful for skipping.</p>
+                                        <div className="flex items-start gap-2 sm:gap-3">
+                                            <span className="px-2 py-1 sm:px-3 sm:py-1.5 bg-blue-500/20 text-blue-400 rounded-md sm:rounded-lg font-bold text-xs sm:text-sm whitespace-nowrap flex-shrink-0">NEXT</span>
+                                            <p className="text-xs sm:text-sm">Manually advance to the next question. Normally automatic when timer expires, but useful for skipping.</p>
                                         </div>
-                                        <div className="flex items-start gap-3">
-                                            <span className="px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg font-bold text-sm whitespace-nowrap">FINISH</span>
-                                            <p className="text-sm">Ends the game and shows the winner podium. Results stay visible until you close the session.</p>
+                                        <div className="flex items-start gap-2 sm:gap-3">
+                                            <span className="px-2 py-1 sm:px-3 sm:py-1.5 bg-purple-500/20 text-purple-400 rounded-md sm:rounded-lg font-bold text-xs sm:text-sm whitespace-nowrap flex-shrink-0">FINISH</span>
+                                            <p className="text-xs sm:text-sm">Ends the game and shows the winner podium. Results stay visible until you close the session.</p>
                                         </div>
-                                        <div className="flex items-start gap-3">
-                                            <span className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg font-bold text-sm whitespace-nowrap">CLOSE</span>
-                                            <p className="text-sm">Completely ends the session, clears all data, and returns to idle state. Students are disconnected.</p>
+                                        <div className="flex items-start gap-2 sm:gap-3">
+                                            <span className="px-2 py-1 sm:px-3 sm:py-1.5 bg-red-500/20 text-red-400 rounded-md sm:rounded-lg font-bold text-xs sm:text-sm whitespace-nowrap flex-shrink-0">CLOSE</span>
+                                            <p className="text-xs sm:text-sm">Completely ends the session, clears all data, and returns to idle state. Students are disconnected.</p>
                                         </div>
                                     </div>
                                 </div>
                             </section>
 
                             <section>
-                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-pink-600 flex items-center justify-center text-lg">💃</span>
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+                                    <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-pink-600 flex items-center justify-center text-base sm:text-lg flex-shrink-0">💃</span>
                                     Dance Moves & Performance
                                 </h3>
-                                <div className="pl-13 space-y-3">
+                                <div className="pl-0 sm:pl-11 md:pl-13 space-y-2 sm:space-y-3">
                                     <p>SlayGround gamifies learning with dance move rewards:</p>
                                     <ul className="list-disc pl-5 space-y-2">
                                         <li><strong>Unlock Moves:</strong> When students answer correctly, they unlock dance moves assigned to that question</li>
@@ -516,11 +516,11 @@ export function AdminDashboard() {
                             </section>
 
                             <section>
-                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center text-lg">🎓</span>
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+                                    <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-orange-600 flex items-center justify-center text-base sm:text-lg flex-shrink-0">🎓</span>
                                     Student Experience
                                 </h3>
-                                <div className="pl-13 space-y-3">
+                                <div className="pl-0 sm:pl-11 md:pl-13 space-y-2 sm:space-y-3">
                                     <p>Understanding what students see helps you guide them:</p>
                                     <ol className="list-decimal pl-5 space-y-2">
                                         <li>Students visit <code className="bg-black/30 px-2 py-0.5 rounded">{window.location.host}/play</code> or scan the QR code</li>
@@ -534,37 +534,37 @@ export function AdminDashboard() {
                                 </div>
                             </section>
 
-                            <section className="glass-panel p-6 rounded-2xl bg-gradient-to-br from-red-500/5 to-transparent border-red-500/20">
-                                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                                    <span className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-lg">⚠️</span>
+                            <section className="glass-panel p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl bg-gradient-to-br from-red-500/5 to-transparent border-red-500/20">
+                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+                                    <span className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-red-600 flex items-center justify-center text-base sm:text-lg flex-shrink-0">⚠️</span>
                                     Troubleshooting
                                 </h3>
-                                <div className="pl-13 space-y-4">
+                                <div className="pl-0 sm:pl-11 md:pl-13 space-y-3 sm:space-y-4">
                                     <div>
-                                        <h4 className="font-bold text-white mb-2">❓ Students not appearing in real-time?</h4>
-                                        <p className="text-sm">The system polls every 2 seconds. Wait a moment, or refresh the page. Check that students entered the correct PIN.</p>
+                                        <h4 className="font-bold text-white mb-1 sm:mb-2 text-sm sm:text-base">❓ Students not appearing in real-time?</h4>
+                                        <p className="text-xs sm:text-sm">The system polls every 2 seconds. Wait a moment, or refresh the page. Check that students entered the correct PIN.</p>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white mb-2">❓ Projector shows blank screen?</h4>
-                                        <p className="text-sm">Ensure you've initialized a game first. The projector needs an active game PIN to display content. Try refreshing the Host View tab.</p>
+                                        <h4 className="font-bold text-white mb-1 sm:mb-2 text-sm sm:text-base">❓ Projector shows blank screen?</h4>
+                                        <p className="text-xs sm:text-sm">Ensure you've initialized a game first. The projector needs an active game PIN to display content. Try refreshing the Host View tab.</p>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white mb-2">❓ Game won't start?</h4>
-                                        <p className="text-sm">Make sure at least one student has joined. Check that you clicked the Play icon on a quest to generate a PIN.</p>
+                                        <h4 className="font-bold text-white mb-1 sm:mb-2 text-sm sm:text-base">❓ Game won't start?</h4>
+                                        <p className="text-xs sm:text-sm">Make sure at least one student has joined. Check that you clicked the Play icon on a quest to generate a PIN.</p>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white mb-2">❓ Timer stuck or wrong duration?</h4>
-                                        <p className="text-sm">The timer duration is set per-quest in the Quest Builder. Default is 30 seconds. Edit the quest to change it.</p>
+                                        <h4 className="font-bold text-white mb-1 sm:mb-2 text-sm sm:text-base">❓ Timer stuck or wrong duration?</h4>
+                                        <p className="text-xs sm:text-sm">The timer duration is set per-quest in the Quest Builder. Default is 30 seconds. Edit the quest to change it.</p>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white mb-2">❓ Need to reset everything?</h4>
-                                        <p className="text-sm">Click <strong>Close Session</strong> to completely clear the current game. You can then start fresh with a new quest.</p>
+                                        <h4 className="font-bold text-white mb-1 sm:mb-2 text-sm sm:text-base">❓ Need to reset everything?</h4>
+                                        <p className="text-xs sm:text-sm">Click <strong>Close Session</strong> to completely clear the current game. You can then start fresh with a new quest.</p>
                                     </div>
                                 </div>
                             </section>
                         </div>
 
-                        <div className="mt-12 pt-8 border-t border-white/10 flex justify-between items-center">
+                        <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
                             <p className="text-slate-400 text-sm">💡 <strong>Tip:</strong> You can reopen this guide anytime from the User Manual button</p>
                             <Button variant="primary" onClick={handleCloseManual}>
                                 Got it, Let's Go!
