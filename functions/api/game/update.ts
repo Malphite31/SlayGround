@@ -33,18 +33,17 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
             if (!success) return errorResponse('Failed to start game', 500);
 
-        } else if (action === 'finish_game') {
+        } else if (action === 'archive_game') {
             const { success } = await env.DB.prepare(
-                `UPDATE games SET status = 'finished' WHERE pin = ?`
+                `UPDATE games SET status = 'archived' WHERE pin = ?`
             ).bind(pin).run();
 
-            // Clean up students (Ephemeral data) - NO, keep them for the results screen!
-            // They will be cleaned up when a NEW game starts (in create.ts)
-            // await env.DB.prepare(
-            //    `DELETE FROM students WHERE game_id = (SELECT id FROM games WHERE pin = ?)`
-            // ).bind(pin).run();
+            // When explicitly archiving, WE DO want to delete students
+            await env.DB.prepare(
+                `DELETE FROM students WHERE game_id = (SELECT id FROM games WHERE pin = ?)`
+            ).bind(pin).run();
 
-            if (!success) return errorResponse('Failed to finish game', 500);
+            if (!success) return errorResponse('Failed to archive game', 500);
         }
 
         return jsonResponse({ success: true });

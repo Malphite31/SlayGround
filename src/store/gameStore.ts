@@ -338,7 +338,21 @@ export const useGameStore = create<GameState>()(
                 set({ syncInterval: null });
             },
 
-            endGame: () => {
+            endGame: async () => {
+                const pin = get().gamePin;
+                if (pin) {
+                    try {
+                        // Tell server to archive the game so it doesn't resurrect
+                        await fetch('/api/game/update', {
+                            method: 'POST',
+                            body: JSON.stringify({ action: 'archive_game', pin })
+                        });
+                        console.log('[EndGame] Archived game on server:', pin);
+                    } catch (e) {
+                        console.error('[EndGame] Failed to archive game:', e);
+                    }
+                }
+
                 get().stopSync();
                 set({
                     status: 'idle',
