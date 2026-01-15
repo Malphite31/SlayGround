@@ -191,7 +191,9 @@ export function HostView() {
     if (status === 'finished') {
         const sortedStudents = [...students].sort((a, b) => b.score - a.score);
         const top3 = sortedStudents.slice(0, 3);
-        const winners = sortedStudents.filter(s => s.score === top3[0]?.score);
+        // Add safe check for empty students array
+        const winningScore = top3.length > 0 ? top3[0].score : 0;
+        const winners = sortedStudents.filter(s => s.score === winningScore);
 
         // Countdown timer - triggers performance after countdown finishes
         useEffect(() => {

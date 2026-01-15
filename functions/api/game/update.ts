@@ -38,10 +38,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 `UPDATE games SET status = 'finished' WHERE pin = ?`
             ).bind(pin).run();
 
-            // Clean up students (Ephemeral data)
-            await env.DB.prepare(
-                `DELETE FROM students WHERE game_id = (SELECT id FROM games WHERE pin = ?)`
-            ).bind(pin).run();
+            // Clean up students (Ephemeral data) - NO, keep them for the results screen!
+            // They will be cleaned up when a NEW game starts (in create.ts)
+            // await env.DB.prepare(
+            //    `DELETE FROM students WHERE game_id = (SELECT id FROM games WHERE pin = ?)`
+            // ).bind(pin).run();
 
             if (!success) return errorResponse('Failed to finish game', 500);
         }
